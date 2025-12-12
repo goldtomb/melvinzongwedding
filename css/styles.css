@@ -47,7 +47,6 @@ background-color: var(--magnolia);
   left: 0;
   right: 0;
   z-index: 1000;
-  background-color: var(--magnolia);
 }
 .nav-bar {
   width: 85%;
@@ -125,14 +124,7 @@ background-color: var(--magnolia);
 } */
 }
 /* HERO */
-.hero {
-  /* display: flex;
-  align-items: center;
-  justify-content: space-around; */
-  background-color: var(--magnolia);
-  /* min-height: 600px; */
-  color: var(--battleship-gray);
-}
+
 .row {
   width: 85%;
   margin: auto;
@@ -208,8 +200,6 @@ h2 {
 /* INFO */
 .info {
   padding: 30px 0;
-  color: var(--magnolia);
-  background-color: var(--battleship-gray);
   font-weight: bold;
 }
 .info h1 {
@@ -225,8 +215,6 @@ h2 {
 /* parking */
 .parking {
    padding: 30px 0;
-  background-color: var(--magnolia);
-  color: var(--battleship-gray);
   font-weight: bold;
   font-size: 2rem;
   align-items: center;
