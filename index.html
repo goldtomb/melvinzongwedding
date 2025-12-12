@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://kit.fontawesome.com/588a463829.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="./css/styles.css" />
+    <title>Melvin & Zong's Wedding</title>
+  </head>
+  <body>
+    <div class="container header light" id="home">
+      <nav class="nav-bar">
+        <div class="nav-brand">Melvin & Zong</div>
+        <ul class="nav-list">
+          <li><a class="nav-link" href="#">Home</a></li>
+          <li><a class="nav-link" href="#countdown"> Countdown</a></li>
+
+          <li><a class="nav-link" href="#story">Our Story</a></li>
+          <li><a class="nav-link" href="#info">Q / A</a></li>
+
+          <li><a class="nav-link" href="#rsvp">RSVP</a></li>
+        </ul>
+
+        <div class="toggle-menu">
+          <i class="fa-solid fa-bars"></i>
+        </div>
+      </nav>
+    </div>
+
+    <div class="container hero">
+      <div class="row">
+        <div class="col">
+          <h1 class="title">Melvin & Zong's Big Day</h1>
+          <h1>Celebrate with us in Sacramento!</h1>
+          <p>April 10, 2026</p>
+          <p>5:00 PM - 11:00 PM</p>
+          <a href="#rsvp"><button class="btn-link">RSVP</button></a>
+        </div>
+        <!-- <div class="col hero-img">
+            <img src="./assets/images/Beige Minimalist Photo Wedding Invitation Card.png" alt="">
+          </div> -->
+      </div>
+    </div>
+    <div class="container countdown dark" id="countdown">
+      <div class="row">
+        <div class="col">
+          <div class="timer">
+            <h1 class="time"></h1>
+            <h2 class="days-left">UNTIL THE BIG DAY</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container our-story light" id="story">
+      <div class="row">
+        <div class="col">
+          <img src="./assets/images/beach-kiss.jpeg" alt="" />
+        </div>
+        <div class="col">
+          <h2 class="story-title">Our Story</h2>
+        </div>
+      </div>
+    </div>
+    
+    <div class="container info" id="info">
+      <h1>You have questions? We have answers;</h1>
+      <div class="row">
+        <div class="col">
+          <p>
+            Attire: We kindly request that our guests adhere to a formal dress
+            code for our wedding celebration
+          </p>
+          <p>
+            Children Policy: We love your children, we have kid's room reserved
+            up to 30 of your kiddos
+          </p>
+          <p>
+            Gifts: Your presence is the greatest gift we could ask for. If you
+            wish to honor us with a gift, we kindly request no boxed gifts
+          </p>
+          <p>
+            Refreshments: Snacks and refreshments, including cocktails and
+            signature drinks, will be available in the lobby starting at 5:00 PM
+          </p>
+          <p>
+            RSVP Request: Please RSVP by November 25th to ensure we can plan
+            accordingly for your presence
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="container parking">
+      <div class="row">
+        <div class="col">
+          <h1>Parking: <br><br></h1>
+          <p>
+            1.) City Hall Parking Garage: 1000 I Street <br />
+            2.) Metropolis Parking Garage: 849 J Street <br />
+          </p>
+          <p>
+            <br>
+            The following map shows the Metropolis parking Garage (red star) and
+            arrows around the building to get to the main Galleria entrance
+            indicated by the green star
+          </p>
+
+        </div>
+        <div class="col">
+          <img src="./assets/images/directions and parking.png" alt="" />
+
+          <h2 style="text-align: center">
+            Tsakopoulos Library Galleria<br />
+            828 I Street<br />
+            Sacramento, California<br />
+            95814
+          </h2>
+        </div>
+      </div>
+    </div>
+    <div class="container rsvp dark" id="rsvp">
+      <h1>RSVP</h1>
+      <div class="row">
+        <div class="col">
+          <form
+            action="https://api.web3forms.com/submit"
+            method="POST"
+            class="rsvp-form"
+          >
+            <!-- Replace with your Access Key -->
+            <input
+              type="hidden"
+              name="access_key"
+              value="f08bf96c-a515-47ba-94f3-62d8af39a478"
+            />
+
+            <!-- Form Inputs. Each input must have a name="" attribute -->
+            <label for="name">Name:</label>
+            <input type="text" name="name" placeholder="Your name" required />
+           <!--  <label for="attendance">Will you attend?</label>
+            <select id="attendance" name="attendance" required>
+              <option value="">Please select</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select> -->
+
+            <label for="guests">Number of Adults:</label>
+            <input
+              type="number"
+              id="guests"
+              name="guests"
+              min="1"
+              placeholder="How many adults total?"
+              required
+            />
+             <label for="guests">Number of Children:</label>
+            <input
+              type="number"
+              id="guests"
+              name="guests"
+              min="1"
+              placeholder="How many children total?"
+              required
+            />
+
+
+            <!-- Honeypot Spam Protection -->
+            <input
+              type="checkbox"
+              name="botcheck"
+              class="hidden"
+              style="display: none"
+            />
+
+            <!-- Custom Confirmation / Success Page -->
+            <!-- <input type="hidden" name="redirect" value="https://mywebsite.com/thanks.html"> -->
+
+            <button class="btn-link dark" type="submit">Submit RSVP</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <footer>
+      <div class="container light">
+        <div class="row">
+          <div class="col">
+            <h1>2026.</h1>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="./scripts.js"></script>
+  </body>
+</html>
