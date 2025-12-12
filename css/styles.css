@@ -33,7 +33,7 @@ body {
 }
 
 .light {
-background-color: var(--magnolia);
+background-color: white;
   color: var(--battleship-gray);
 }
 
