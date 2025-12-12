@@ -222,12 +222,45 @@ h2 {
   font-size: 2rem;
 }
 
+/* parking */
 .parking {
    padding: 30px 0;
   background-color: var(--magnolia);
   color: var(--battleship-gray);
   font-weight: bold;
   font-size: 2rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.parking iframe {
+  display: block;
+  margin: auto;
+}
+ 
+/* itinerary */
+.itinerary {
+    padding: 30px 0;
+  
+  font-weight: bold;
+  font-size: 2rem;
+  align-items: start;
+  justify-content: space-between;
+  /* text-align: center; */
+}
+.itinerary h1 {
+  padding: 50px;
+}
+.itinerary p{
+  padding: 10px 0px;
+  font-size: 1.5rem;
+}
+.itinerary h2 {
+  font-size: 1.8rem;
+}
+.itinerary span {
+  font-weight:900;
+  font-size: 2.5rem;
 }
 /* rsvp */
 .rsvp {
