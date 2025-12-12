@@ -353,6 +353,10 @@ footer h1 {
   .col {
     width: 100%;
   }
+  iframe {
+    width: 300px;
+    height: 300px;
+  }
   .container {
     opacity: 1;
   }
