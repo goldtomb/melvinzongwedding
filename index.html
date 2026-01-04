@@ -24,6 +24,12 @@
           <li><a class="nav-link" href="#itinerary">Itinerary</a></li>
 
           <li><a class="nav-link" href="#rsvp">RSVP</a></li>
+          <li>
+            <button id="language-toggle" class="language-btn">
+              <span class="lang-flag flag-gt"></span>
+              <span class="lang-text">ES</span>
+            </button>
+          </li>
         </ul>
 
         <div class="toggle-menu">
@@ -35,11 +41,11 @@
     <div class="container hero light">
       <div class="row">
         <div class="col">
-          <h1 class="title">Melvin & Zong's Big Day</h1>
-          <h1>Celebrate with us in Sacramento!</h1>
+          <h1 class="title" data-translate="hero-title">Melvin & Zong's Big Day</h1>
+          <h1 data-translate="hero-subtitle">Celebrate with us in Sacramento!</h1>
           <p>April 10, 2026</p>
           <p>5:00 PM - 11:00 PM</p>
-          <a href="#rsvp"><button class="btn-link">RSVP</button></a>
+          <a href="#rsvp"><button class="btn-link" data-translate="rsvp-button">RSVP</button></a>
         </div>
         <!-- <div class="col hero-img">
             <img src="./assets/images/Beige Minimalist Photo Wedding Invitation Card.png" alt="">
@@ -51,7 +57,7 @@
         <div class="col">
           <div class="timer">
             <h1 class="time"></h1>
-            <h2 class="days-left">UNTIL THE BIG DAY</h2>
+            <h2 class="days-left" data-translate="countdown-text">UNTIL THE BIG DAY</h2>
           </div>
         </div>
       </div>
@@ -62,32 +68,42 @@
           <!-- <img src="./assets/images/beach-kiss.jpeg" alt="" /> -->
         </div>
         <div class="col">
-          <h2 class="story-title">Our Story</h2>
+          <h2 class="story-title" data-translate="our-story-title">Our Story</h2>
+          <div class="story-content">
+            <p data-translate="story-paragraph1">
+              Their story began in the least romantic of places: a computer lab. Between glowing screens and quiet focus, something unexpected clicked, more than just the keyboards. That spark soon climbed higher, quite literally, into a treehouse where laughter came easily and a simple hangout turned into the beginning of something real.
+            </p>
+            <p data-translate="story-paragraph2">
+              Their love learned to travel early, winding along the coast with the ocean as their witness and adventure as their guide. Life, of course, had plans of its own. Sending them miles apart to build careers, chase dreams, and grow into the people they were meant to be.
+            </p>
+            <p data-translate="story-paragraph3">
+              Distance tried its best, but love proved stubborn, patient, and very good at long-distance communication. What started with shared screens and shared dreams has become one life, one promise, and one forever. The best stories don't follow a straight line, but always find their way home.
+            </p>
+          </div>
         </div>
       </div>
     </div>
-
     <div class="container info dark" id="info">
-      <h1>You have questions? We have answers;</h1>
+      <h1 data-translate="qa-title">You have questions? We have answers;</h1>
       <div class="row">
         <div class="col">
-          <p>
+          <p data-translate="attire-text">
             Attire: We kindly request that our guests adhere to a formal dress
             code for our wedding celebration
           </p>
-          <p>
+          <p data-translate="children-text">
             Children Policy: We love your children, we have kid's room reserved
-            up to 30 of your kiddos
+            up to 70 of your kiddos
           </p>
-          <p>
+          <p data-translate="gifts-text">
             Gifts: Your presence is the greatest gift we could ask for. If you
             wish to honor us with a gift, we kindly request no boxed gifts
           </p>
-          <p>
+          <p data-translate="refreshments-text">
             Refreshments: Snacks and refreshments, including cocktails and
             signature drinks, will be available in the lobby starting at 5:00 PM
           </p>
-          <p>
+          <p data-translate="rsvp-request-text">
             RSVP Request: Please RSVP by November 25th to ensure we can plan
             accordingly for your presence
           </p>
@@ -97,12 +113,12 @@
     <div class="container parking light" id="parking">
       <div class="row">
         <div class="col">
-          <h1>Parking: <br /><br /></h1>
+          <h1 data-translate="parking-title">Parking: <br /><br /></h1>
           <p>
-            1.) City Hall Parking Garage: 1000 I Street <br />
-            2.) Metropolis Parking Garage: 849 J Street <br />
+            1.) <a href="https://maps.google.com/?q=1000+I+Street+Sacramento+CA" target="_blank" class="map-link">City Hall Parking Garage: 1000 I Street</a> <br />
+            2.) <a href="https://maps.google.com/?q=849+J+Street+Sacramento+CA" target="_blank" class="map-link">Metropolis Parking Garage: 849 J Street</a> <br />
           </p>
-          <p>
+          <p data-translate="parking-info">
             <br />
             The following map shows the Metropolis parking Garage (red star) and
             arrows around the building to get to the main Galleria entrance
@@ -123,31 +139,40 @@
           ></iframe>
 
           <br />
-          <h2 style="text-align: center">
-            Tsakopoulos Library Galleria<br />
-            828 I Street<br />
-            Sacramento, California<br />
-            95814
-          </h2>
+          <div class="venue-address" style="text-align: center">
+            <h2>Tsakopoulos Library Galleria</h2>
+            <div class="address-links">
+              <a href="https://maps.google.com/?q=828+I+Street+Sacramento+California+95814" target="_blank" class="map-link google-maps">
+                📍 828 I Street<br />
+                Sacramento, California<br />
+                95814
+              </a>
+              <div class="map-options">
+                <a href="https://maps.google.com/?q=Tsakopoulos+Library+Galleria+Sacramento" target="_blank" class="map-option">Open in Google Maps</a>
+                <span class="separator">|</span>
+                <a href="https://maps.apple.com/?q=828+I+Street+Sacramento+CA+95814" target="_blank" class="map-option">Open in Apple Maps</a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <div class="container itinerary dark" id="itinerary">
       <div class="row">
         <div class="col">
-          <h1>Tentative Itinerary:</h1>
-          <p><span>5 - 6 PM</span><br> Cerveza y Tragos con Mariachis</p>
+          <h1 data-translate="itinerary-title">Tentative Itinerary:</h1>
+          <p><span>5 - 6 PM</span><br><span data-translate="cerveza-time">Cerveza y Tragos con Mariachis</span></p>
           <p>
-            <span>6 - 8 PM</span> <br>Dinner and DJ for those that can't wait to hit the dancing
-            floor
+            <span>6 - 8 PM</span> <br><span data-translate="dinner-time">Dinner and DJ for those that can't wait to hit the dancing
+            floor</span>
           </p>
-          <p><span>7:30 - 10 PM <br></span>Banda</p>
+          <p><span>7:30 - 10 PM <br></span><span data-translate="banda-time">Banda</span></p>
           <p>
-            <span>10 - 11PM</span> <br>Closing hour, get those last few dance moves in w/ our DJ
-            music
+            <span>10 - 11PM</span> <br><span data-translate="closing-time">Closing hour, get those last few dance moves in w/ our DJ
+            music</span>
           </p>
 <br><br>
-          <h2>
+          <h2 data-translate="bartending-info">
             There will be two bartending stations. <br>(Melvin doesn't like waiting
             in line to get his drinks so hopefully this helps)
           </h2>
@@ -155,63 +180,155 @@
       </div>
     </div>
     <div class="container rsvp light" id="rsvp">
-      <h1>RSVP</h1>
+      <h1 data-translate="rsvp-title">RSVP</h1>
       <div class="row">
         <div class="col">
-          <form
-            action="https://api.web3forms.com/submit"
-            method="POST"
-            class="rsvp-form"
-          >
-            <!-- Replace with your Access Key -->
-            <input
-              type="hidden"
-              name="access_key"
-              value="f08bf96c-a515-47ba-94f3-62d8af39a478"
-            />
+          <!-- Main Wedding RSVP Form -->
+          <div id="main-rsvp-form">
+            <form
+              id="wedding-rsvp"
+              action="https://script.google.com/macros/s/AKfycbzJhqSbypvC70QKnryYgTBBsqy9DmqJaU7ln56xmKGA3mvohJXOdLlGjxOQsyZrfwQw/exec"
+              method="POST"
+              class="rsvp-form"
+            >
+              <!-- Google Apps Script Web App URL -->
+              <input
+                type="hidden"
+                name="form_type"
+                value="wedding"
+              />
 
-            <!-- Form Inputs. Each input must have a name="" attribute -->
-            <label for="name">Name:</label>
-            <input type="text" name="name" placeholder="Your name" required />
-            <!--  <label for="attendance">Will you attend?</label>
-            <select id="attendance" name="attendance" required>
-              <option value="">Please select</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select> -->
+              <!-- Wedding RSVP Section -->
+              <h2 data-translate="wedding-rsvp-title">Wedding Celebration RSVP</h2>
+              
+              <label for="primary-name" data-translate="primary-name-label">Primary Contact Name:</label>
+              <input type="text" id="primary-name" name="primary_name" data-translate-placeholder="primary-name-placeholder" placeholder="Your full name" required />
 
-            <label for="guests">Number of Adults:</label>
-            <input
-              type="number"
-              id="guests"
-              name="guests"
-              min="1"
-              placeholder="How many adults total?"
-              required
-            />
-            <label for="guests">Number of Children:</label>
-            <input
-              type="number"
-              id="guests"
-              name="guests"
-              min="1"
-              placeholder="How many children total?"
-              required
-            />
+              <label for="attendance" data-translate="attendance-label">Will you attend our wedding?</label>
+              <select id="attendance" name="attendance" required>
+                <option value="" data-translate="please-select">Please select</option>
+                <option value="yes" data-translate="attendance-yes">Yes, I'll be there!</option>
+                <option value="no" data-translate="attendance-no">Sorry, can't make it</option>
+              </select>
 
-            <!-- Honeypot Spam Protection -->
-            <input
-              type="checkbox"
-              name="botcheck"
-              class="hidden"
-              style="display: none"
-            />
+              <div id="attendance-details" style="display: none;">
+                <label for="adults" data-translate="adults-label">Number of Adults:</label>
+                <input
+                  type="number"
+                  id="adults"
+                  name="adults"
+                  min="0"
+                  max="10"
+                  data-translate-placeholder="adults-placeholder"
+                  placeholder="How many adults total?"
+                />
+                
+                <label for="children" data-translate="children-label">Number of Children:</label>
+                <input
+                  type="number"
+                  id="children"
+                  name="children"
+                  min="0"
+                  max="10"
+                  data-translate-placeholder="children-placeholder"
+                  placeholder="How many children total?"
+                />
 
-            <!-- Custom Confirmation / Success Page -->
-            <!-- <input type="hidden" name="redirect" value="https://mywebsite.com/thanks.html"> -->
+                <div id="guest-names">
+                  <h3 data-translate="guest-names-title">Please provide first and last names of all attending guests:</h3>
+                  <div id="guest-list">
+                    <!-- Guest name inputs will be dynamically added here -->
+                  </div>
+                </div>
+              </div>
 
-            <button class="btn-link dark" type="submit">Submit RSVP</button>
-          </form>
+              <!-- Honeypot Spam Protection -->
+              <input
+                type="checkbox"
+                name="botcheck"
+                class="hidden"
+                style="display: none"
+              />
+
+              <!-- Custom Confirmation / Success Page -->
+              <!-- <input type="hidden" name="redirect" value="https://mywebsite.com/thanks.html"> -->
+
+              <button class="btn-link dark" type="submit" data-translate="submit-wedding">Submit Wedding RSVP</button>
+            </form>
+          </div>
+
+          <!-- After Party RSVP Form (Hidden initially) -->
+          <div id="after-party-rsvp-form" style="display: none;">
+            <div class="rsvp-success-message">
+              <h2 data-translate="wedding-success-title">✅ Thank you for your wedding RSVP!</h2>
+              <p data-translate="wedding-success-message">We're excited to celebrate with you!</p>
+            </div>
+
+            <form
+              id="after-party-rsvp"
+              action="https://script.google.com/macros/s/AKfycbzJhqSbypvC70QKnryYgTBBsqy9DmqJaU7ln56xmKGA3mvohJXOdLlGjxOQsyZrfwQw/exec"
+              method="POST"
+              class="rsvp-form after-party-form"
+            >
+              <!-- Google Apps Script Web App URL -->
+              <!-- Hidden field to identify this as after party RSVP -->
+              <input type="hidden" name="form_type" value="after_party" />
+              <input type="hidden" id="after-party-primary-name" name="primary_name" value="" />
+
+              <div class="after-party-section">
+                <h2 data-translate="after-party-title">After Party RSVP (Adults 21+ Only)</h2>
+                <div class="after-party-info">
+                  <p data-translate="after-party-info">If enough guests show interest for after party, it'll be held at <strong>Cilantro's Mexican Restaurant & Bar</strong> 
+                  (0.2 miles from our event, ~4 minute walk). We'll confirm closer to date for those that are interested. 
+                  Cilantro's will continue with Banda and DJ music.</p>
+                </div>
+
+                <label for="after-party-attendance" data-translate="after-party-interest">Are you interested in the after party?</label>
+                <select id="after-party-attendance" name="after_party_attendance" required>
+                  <option value="" data-translate="please-select">Please select</option>
+                  <option value="yes" data-translate="after-party-yes">Yes, I'm interested!</option>
+                  <option value="no" data-translate="after-party-no">No, just the wedding for me</option>
+                </select>
+
+                <div id="after-party-details" style="display: none;">
+                  <label for="after-party-adults" data-translate="after-party-adults-label">Number of Adults 21+ for After Party:</label>
+                  <input
+                    type="number"
+                    id="after-party-adults"
+                    name="after_party_adults"
+                    min="0"
+                    max="10"
+                    data-translate-placeholder="after-party-adults-placeholder"
+                    placeholder="Adults 21+ attending after party"
+                  />
+                  
+                  <div id="after-party-guest-names">
+                    <h3 data-translate="after-party-names-title">Please provide first and last names of all after party attendees (21+ only):</h3>
+                    <div id="after-party-guest-list">
+                      <!-- After party guest name inputs will be dynamically added here -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Honeypot Spam Protection -->
+              <input
+                type="checkbox"
+                name="botcheck"
+                class="hidden"
+                style="display: none"
+              />
+
+              <button class="btn-link dark" type="submit" data-translate="submit-after-party">Submit After Party RSVP</button>
+            </form>
+          </div>
+
+          <!-- Final Success Message (Hidden initially) -->
+          <div id="final-success" style="display: none;">
+            <h2 data-translate="final-success-title">🎉 All RSVPs Complete!</h2>
+            <p data-translate="final-success-message1">Thank you for taking the time to RSVP. We can't wait to celebrate with you!</p>
+            <p data-translate="final-success-message2">We'll be in touch with more details as the date approaches.</p>
+          </div>
         </div>
       </div>
     </div>
