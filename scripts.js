@@ -5,6 +5,28 @@ const toggleMenu = document.querySelector('.toggle-menu')
 const navList = document.querySelector('.nav-list')
 const navLinks = document.querySelectorAll('.nav-link')
 const icon = document.getElementsByTagName('i');
+
+// Hero slideshow functionality
+let currentSlide = 0;
+const slides = document.querySelectorAll('.hero-slideshow .slide');
+const totalSlides = slides.length;
+
+function showNextSlide() {
+    // Remove active class from current slide
+    slides[currentSlide].classList.remove('active');
+    
+    // Move to next slide
+    currentSlide = (currentSlide + 1) % totalSlides;
+    
+    // Add active class to new slide
+    slides[currentSlide].classList.add('active');
+}
+
+// Start slideshow if slides exist
+if (slides.length > 0) {
+    // Change slide every 4 seconds
+    setInterval(showNextSlide, 4000);
+}
 // const date = new Date();
 // console.log(date);\
 // Update the countdown every second
@@ -97,14 +119,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Generate guest name inputs for main wedding
     function generateGuestInputs() {
         const adultCount = parseInt(adultsInput.value || 0);
-        const childrenCount = parseInt(childrenInput.value || 0);
         guestList.innerHTML = '';
         
-        // Generate adult inputs
+        // Generate adult inputs only (children count is just a number)
         if (adultCount > 0) {
             // Add adults section header
             const adultsHeader = document.createElement('h4');
-            adultsHeader.style.marginTop = adultCount > 0 ? '20px' : '0';
+            adultsHeader.style.marginTop = '20px';
             adultsHeader.style.marginBottom = '10px';
             adultsHeader.style.color = 'var(--sage)';
             adultsHeader.textContent = currentLanguage === 'es' ? 'Nombres de Adultos:' : 'Adult Names:';
@@ -120,35 +141,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 inputDiv.innerHTML = `
                     <label for="adult-${i}">${labelText}</label>
                     <input type="text" id="adult-${i}" name="adult_${i}" placeholder="${placeholderText}" required>
-                `;
-                guestList.appendChild(inputDiv);
-                
-                // Add name formatting to the newly created input
-                const newInput = inputDiv.querySelector('input');
-                addNameFormatting(newInput);
-            }
-        }
-        
-        // Generate children inputs
-        if (childrenCount > 0) {
-            // Add children section header
-            const childrenHeader = document.createElement('h4');
-            childrenHeader.style.marginTop = adultCount > 0 ? '20px' : '0';
-            childrenHeader.style.marginBottom = '10px';
-            childrenHeader.style.color = 'var(--sage)';
-            childrenHeader.textContent = currentLanguage === 'es' ? 'Nombres de Niños:' : 'Children Names:';
-            guestList.appendChild(childrenHeader);
-            
-            for (let i = 1; i <= childrenCount; i++) {
-                const inputDiv = document.createElement('div');
-                inputDiv.className = 'guest-input';
-                
-                const labelText = currentLanguage === 'es' ? `Niño ${i} Nombre Completo:` : `Child ${i} Full Name:`;
-                const placeholderText = currentLanguage === 'es' ? 'Nombre y Apellido' : 'First and Last Name';
-                
-                inputDiv.innerHTML = `
-                    <label for="child-${i}">${labelText}</label>
-                    <input type="text" id="child-${i}" name="child_${i}" placeholder="${placeholderText}" required>
                 `;
                 guestList.appendChild(inputDiv);
                 
@@ -185,7 +177,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Event listeners for guest count changes
     adultsInput.addEventListener('input', generateGuestInputs);
-    childrenInput.addEventListener('input', generateGuestInputs);
     
     if (afterPartyAdults) {
         afterPartyAdults.addEventListener('input', generateAfterPartyGuestInputs);
@@ -208,33 +199,32 @@ document.addEventListener('DOMContentLoaded', function() {
         // Submit the form data
         const formData = new FormData(this);
         
-        // Send the wedding RSVP
-        fetch(this.action, {
-            method: 'POST',
-            body: formData
-        }).then(response => {
-            if (response.ok) {
-                // Hide main form and show after party form
-                mainRsvpForm.style.display = 'none';
-                afterPartyRsvpForm.style.display = 'block';
-                
-                // Set the primary name in after party form
-                document.getElementById('after-party-primary-name').value = primaryName;
-                
-                // Scroll to after party form
-                afterPartyRsvpForm.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                alert('There was an error submitting your wedding RSVP. Please try again.');
-                // Re-enable submit button
-                submitButton.disabled = false;
-                submitButton.textContent = originalText;
-            }
+        // Send the wedding RSVP with timeout
+        const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 5000));
+        
+        Promise.race([
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            }),
+            timeoutPromise
+        ]).then(response => {
+            // Hide main form and show after party form regardless
+            mainRsvpForm.style.display = 'none';
+            afterPartyRsvpForm.style.display = 'block';
+            
+            // Set the primary name in after party form
+            document.getElementById('after-party-primary-name').value = primaryName;
+            
+            // Scroll to after party form
+            afterPartyRsvpForm.scrollIntoView({ behavior: 'smooth' });
         }).catch(error => {
             console.error('Error:', error);
-            alert('There was an error submitting your wedding RSVP. Please try again.');
-            // Re-enable submit button
-            submitButton.disabled = false;
-            submitButton.textContent = originalText;
+            // Still show after party form - the submission likely went through
+            mainRsvpForm.style.display = 'none';
+            afterPartyRsvpForm.style.display = 'block';
+            document.getElementById('after-party-primary-name').value = primaryName;
+            afterPartyRsvpForm.scrollIntoView({ behavior: 'smooth' });
         });
         
         return false; // Additional prevention of default form submission

@@ -22,11 +22,15 @@ function doPost(e) {
       row.push(adultCount);
       row.push(childrenCount);
       
-      // Add individual adult names in separate columns (up to 10 columns)
+      // Collect all adult names and combine into one column
+      var adultNames = [];
       for (var i = 1; i <= 10; i++) {
         var adultName = data['adult_' + i] || '';
-        row.push(adultName);
+        if (adultName) {
+          adultNames.push(adultName);
+        }
       }
+      row.push(adultNames.join(', '));
       
       sheet.appendRow(row);
       
@@ -42,11 +46,15 @@ function doPost(e) {
       var adultCount = parseInt(data.after_party_adults || 0);
       row.push(adultCount);
       
-      // Add individual adult names in separate columns (up to 10 columns)
+      // Collect all guest names and combine into one column
+      var guestNames = [];
       for (var i = 1; i <= 10; i++) {
-        var adultName = data['after_party_guest_' + i] || '';
-        row.push(adultName);
+        var guestName = data['after_party_guest_' + i] || '';
+        if (guestName) {
+          guestNames.push(guestName);
+        }
       }
+      row.push(guestNames.join(', '));
       
       sheet.appendRow(row);
     }
@@ -69,19 +77,15 @@ function getOrCreateSheet(spreadsheet, sheetName, formType) {
     
     // Set up headers based on form type
     if (formType === 'wedding') {
-      // Create headers with individual columns for adults and children
+      // Create headers with single column for all adult names
       var headers = [
         'Timestamp',
         'Primary Name', 
         'Attendance',
         'Adults Count',
-        'Children Count'
+        'Children Count',
+        'Adult Names'
       ];
-      
-      // Add individual adult columns (up to 10 adults)
-      for (var i = 1; i <= 10; i++) {
-        headers.push('Adult Guest ' + i);
-      }
       
       sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
       
@@ -90,13 +94,9 @@ function getOrCreateSheet(spreadsheet, sheetName, formType) {
         'Timestamp',
         'Primary Name',
         'After Party Attendance',
-        'Adults 21+ Count'
+        'Adults 21+ Count',
+        'Guest Names'
       ];
-      
-      // Add individual after party guest columns (up to 10 guests)
-      for (var i = 1; i <= 10; i++) {
-        headers.push('Guest ' + i);
-      }
       
       sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     }
