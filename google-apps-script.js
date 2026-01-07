@@ -18,9 +18,11 @@ function doPost(e) {
       
       // Add separate columns for adults and children
       var adultCount = parseInt(data.adults || 0);
-      var childrenCount = parseInt(data.children || 0);
+      var childrenUnder10 = parseInt(data.children_under_10 || 0);
+      var children10Plus = parseInt(data.children_10_plus || 0);
       row.push(adultCount);
-      row.push(childrenCount);
+      row.push(childrenUnder10);
+      row.push(children10Plus);
       
       // Collect all adult names and combine into one column
       var adultNames = [];
@@ -83,7 +85,8 @@ function getOrCreateSheet(spreadsheet, sheetName, formType) {
         'Primary Name', 
         'Attendance',
         'Adults Count',
-        'Children Count',
+        'Children Under 10',
+        'Children 10+',
         'Adult Names'
       ];
       

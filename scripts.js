@@ -6,17 +6,128 @@ const navList = document.querySelector('.nav-list')
 const navLinks = document.querySelectorAll('.nav-link')
 const icon = document.getElementsByTagName('i');
 
+// Initialize language variable
+let currentLanguage = 'en';
+
+// Language selection overlay handling
+const languageOverlay = document.getElementById('language-overlay');
+const languageButtons = document.querySelectorAll('.lang-btn');
+
+// Check if we should show the language overlay
+function shouldShowLanguageOverlay() {
+    // Don't show on RSVP page
+    if (window.location.pathname.includes('rsvp.html')) {
+        console.log('Overlay not shown - on RSVP page');
+        return false;
+    }
+    
+    // Don't show if user has already selected language in this session
+    if (sessionStorage.getItem('languageSelected') === 'true') {
+        console.log('Overlay not shown - language already selected this session');
+        return false;
+    }
+    
+    // Show overlay on home page for first-time visitors or fresh page loads
+    console.log('Overlay should show - first time visitor or fresh load');
+    return true;
+}
+
+// Initialize language overlay visibility when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, checking overlay...');
+    console.log('Language overlay element:', languageOverlay);
+    
+    if (languageOverlay) {
+        if (shouldShowLanguageOverlay()) {
+            console.log('Showing language overlay');
+            languageOverlay.classList.add('show');
+        } else {
+            console.log('Hiding language overlay');
+            languageOverlay.classList.add('hidden');
+            
+            // If returning user, restore their language preference
+            const savedLang = sessionStorage.getItem('selectedLanguage') || 'en';
+            currentLanguage = savedLang;
+            translatePage(currentLanguage);
+            
+            // Update language toggle button to match saved preference
+            updateLanguageToggleButton();
+        }
+    } else {
+        console.log('Language overlay element not found!');
+    }
+});
+
+// Function to update language toggle button
+function updateLanguageToggleButton() {
+    const langFlag = document.querySelector('.lang-flag');
+    const langText = document.querySelector('.lang-text');
+    if (langFlag && langText) {
+        if (currentLanguage === 'es') {
+            langFlag.className = 'lang-flag flag-us';
+            langText.textContent = 'EN';
+        } else {
+            langFlag.className = 'lang-flag flag-gt';
+            langText.textContent = 'ES';
+        }
+    }
+}
+
+// Handle language selection from overlay
+languageButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const selectedLang = button.getAttribute('data-lang');
+        currentLanguage = selectedLang;
+        translatePage(currentLanguage);
+        
+        // Save language selection to session storage
+        sessionStorage.setItem('languageSelected', 'true');
+        sessionStorage.setItem('selectedLanguage', selectedLang);
+        
+        // Update flag and text to match selection
+        updateLanguageToggleButton();
+        
+        // Hide overlay with animation
+        languageOverlay.classList.add('hidden');
+    });
+});
+
 // Hero slideshow functionality
 let currentSlide = 0;
 const slides = document.querySelectorAll('.hero-slideshow .slide');
 const totalSlides = slides.length;
+let slideOrder = [];
+let slideIndex = 0;
+
+// Fisher-Yates shuffle algorithm
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+// Create initial shuffled order
+function createNewSlideOrder() {
+    const indices = Array.from({length: totalSlides}, (_, i) => i);
+    slideOrder = shuffleArray(indices);
+    slideIndex = 0;
+}
 
 function showNextSlide() {
     // Remove active class from current slide
     slides[currentSlide].classList.remove('active');
     
-    // Move to next slide
-    currentSlide = (currentSlide + 1) % totalSlides;
+    // If we've shown all slides in current shuffle, create new order
+    if (slideIndex >= slideOrder.length) {
+        createNewSlideOrder();
+    }
+    
+    // Get next slide from shuffled order
+    currentSlide = slideOrder[slideIndex];
+    slideIndex++;
     
     // Add active class to new slide
     slides[currentSlide].classList.add('active');
@@ -24,6 +135,13 @@ function showNextSlide() {
 
 // Start slideshow if slides exist
 if (slides.length > 0) {
+    // Create initial shuffle order
+    createNewSlideOrder();
+    // Start with first slide in shuffle
+    currentSlide = slideOrder[0];
+    slideIndex = 1;
+    slides[currentSlide].classList.add('active');
+    
     // Change slide every 4 seconds
     setInterval(showNextSlide, 4000);
 }
@@ -55,10 +173,11 @@ const countdownFunction = setInterval(() => {
     }
 }, 1000);
 
-toggleMenu.addEventListener('click', () => {
+toggleMenu.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent event bubbling
     navList.classList.toggle('open');
     toggleMenu.firstElementChild.classList.toggle('fa-bars');
-   toggleMenu.firstElementChild.classList.toggle('fa-x');
+    toggleMenu.firstElementChild.classList.toggle('fa-x');
 })
 
 // Close menu when any nav link is clicked
@@ -70,12 +189,31 @@ navLinks.forEach(navLink => {
     })
 })
 
+// Close mobile menu when clicking outside
+document.addEventListener('click', (e) => {
+    const navBar = document.querySelector('.nav-bar');
+    const navList = document.querySelector('.nav-list');
+    const toggleMenu = document.querySelector('.toggle-menu');
+    
+    // Check if click is outside the navigation area
+    if (navList && navList.classList.contains('open')) {
+        if (!navBar.contains(e.target)) {
+            navList.classList.remove('open');
+            if (toggleMenu && toggleMenu.firstElementChild) {
+                toggleMenu.firstElementChild.classList.remove('fa-x');
+                toggleMenu.firstElementChild.classList.add('fa-bars');
+            }
+        }
+    }
+})
+
 // RSVP Form Functionality
 document.addEventListener('DOMContentLoaded', function() {
     const attendanceSelect = document.getElementById('attendance');
     const attendanceDetails = document.getElementById('attendance-details');
     const adultsInput = document.getElementById('adults');
-    const childrenInput = document.getElementById('children');
+    const childrenUnder10Input = document.getElementById('children-under-10');
+    const children10PlusInput = document.getElementById('children-10-plus');
     const guestList = document.getElementById('guest-list');
     
     // After party form elements
@@ -151,36 +289,129 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Generate guest name inputs for after party
+    // Store adult names for after party selection
+    let adultNames = [];
+
+    // Generate guest name inputs for after party with checkboxes
     function generateAfterPartyGuestInputs() {
-        const totalAfterPartyGuests = parseInt(afterPartyAdults.value || 0);
         afterPartyGuestList.innerHTML = '';
         
-        for (let i = 1; i <= totalAfterPartyGuests; i++) {
-            const inputDiv = document.createElement('div');
-            inputDiv.className = 'after-party-guest-input';
+        // If we have adult names from the wedding form, show them as checkboxes
+        if (adultNames.length > 0) {
+            const headerText = currentLanguage === 'es' ? 'Seleccione quién asistirá a la fiesta después (solo 21+):' : 'Select who will attend the after party (21+ only):';
+            const header = document.createElement('h4');
+            header.style.marginTop = '10px';
+            header.style.marginBottom = '15px';
+            header.textContent = headerText;
+            afterPartyGuestList.appendChild(header);
             
-            const labelText = currentLanguage === 'es' ? `Invitado Fiesta ${i} Nombre Completo:` : `After Party Guest ${i} Full Name:`;
-            const placeholderText = currentLanguage === 'es' ? 'Nombre y Apellido (solo 21+)' : 'First and Last Name (21+ only)';
+            adultNames.forEach((name, index) => {
+                const checkboxDiv = document.createElement('div');
+                checkboxDiv.className = 'after-party-checkbox';
+                checkboxDiv.style.marginBottom = '10px';
+                
+                checkboxDiv.innerHTML = `
+                    <label style="display: flex; align-items: center; font-size: 1.5rem; cursor: pointer;">
+                        <input type="checkbox" class="after-party-guest-checkbox" value="${name}" name="after_party_guest_${index + 1}" style="margin-right: 10px; width: 20px; height: 20px; cursor: pointer;">
+                        ${name}
+                    </label>
+                `;
+                afterPartyGuestList.appendChild(checkboxDiv);
+            });
             
-            inputDiv.innerHTML = `
-                <label for="after-party-guest-${i}">${labelText}</label>
-                <input type="text" id="after-party-guest-${i}" name="after_party_guest_${i}" placeholder="${placeholderText}" required>
-            `;
-            afterPartyGuestList.appendChild(inputDiv);
-            
-            // Add name formatting to the newly created input
-            const newInput = inputDiv.querySelector('input');
-            addNameFormatting(newInput);
+            // Update count when checkboxes change
+            const checkboxes = afterPartyGuestList.querySelectorAll('.after-party-guest-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateAfterPartyCount);
+            });
         }
+        
+        // Add section for additional guests
+        const additionalGuestsSection = document.createElement('div');
+        additionalGuestsSection.id = 'additional-guests-section';
+        additionalGuestsSection.style.marginTop = '30px';
+        
+        const addGuestButtonText = currentLanguage === 'es' ? '+ Agregar Invitado Adicional' : '+ Add Additional Guest';
+        additionalGuestsSection.innerHTML = `
+            <div id="additional-guests-list" style="margin-top: 20px;"></div>
+
+            <button type="button" id="add-guest-btn" class="btn-link" style="margin: 0; padding: 10px 20px; font-size: 1.3rem;">
+                ${addGuestButtonText}
+            </button>
+        `;
+        afterPartyGuestList.appendChild(additionalGuestsSection);
+        
+        // Add guest button handler
+        document.getElementById('add-guest-btn').addEventListener('click', addAdditionalGuest);
+    }
+    
+    function addAdditionalGuest() {
+        const additionalGuestsList = document.getElementById('additional-guests-list');
+        const currentCount = additionalGuestsList.querySelectorAll('.additional-guest-input').length;
+        const guestNumber = currentCount + 1;
+        const guestIndex = adultNames.length + guestNumber;
+        
+        const labelText = currentLanguage === 'es' ? `Invitado Adicional ${guestNumber}:` : `Additional Guest ${guestNumber}:`;
+        const placeholderText = currentLanguage === 'es' ? 'Nombre y Apellido' : 'First and Last Name';
+        
+        const guestDiv = document.createElement('div');
+        guestDiv.className = 'additional-guest-input';
+        guestDiv.style.marginBottom = '15px';
+        guestDiv.innerHTML = `
+            <label for="after-party-guest-${guestIndex}" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; display: block;">${labelText}</label>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="after-party-guest-${guestIndex}" name="after_party_guest_${guestIndex}" placeholder="${placeholderText}" class="additional-guest-name" style="flex: 1; padding: 18px; font-size: 1.6rem; border: 2px solid var(--battleship-gray); border-radius: 5px; width: 100%;" required>
+                <button type="button" class="remove-guest-btn" style="padding: 6px; background: #d32f2f; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 0.85rem; width: 30px; height: 30px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">✕</button>
+            </div>
+        `;
+        
+        additionalGuestsList.appendChild(guestDiv);
+        
+        // Add name formatting
+        const newInput = guestDiv.querySelector('input');
+        addNameFormatting(newInput);
+        newInput.addEventListener('input', updateAfterPartyCount);
+        
+        // Remove button handler
+        guestDiv.querySelector('.remove-guest-btn').addEventListener('click', function() {
+            guestDiv.remove();
+            renumberAdditionalGuests();
+            updateAfterPartyCount();
+        });
+        
+        updateAfterPartyCount();
+    }
+    
+    function renumberAdditionalGuests() {
+        const additionalGuestsList = document.getElementById('additional-guests-list');
+        const guestDivs = additionalGuestsList.querySelectorAll('.additional-guest-input');
+        
+        guestDivs.forEach((div, index) => {
+            const guestNumber = index + 1;
+            const guestIndex = adultNames.length + guestNumber;
+            const labelText = currentLanguage === 'es' ? `Invitado Adicional ${guestNumber}:` : `Additional Guest ${guestNumber}:`;
+            
+            // Update label
+            const label = div.querySelector('label');
+            label.textContent = labelText;
+            label.setAttribute('for', `after-party-guest-${guestIndex}`);
+            
+            // Update input id and name
+            const input = div.querySelector('input');
+            input.id = `after-party-guest-${guestIndex}`;
+            input.name = `after_party_guest_${guestIndex}`;
+        });
+    }
+    
+    function updateAfterPartyCount() {
+        const checkedCount = document.querySelectorAll('.after-party-guest-checkbox:checked').length;
+        const additionalGuestsCount = document.querySelectorAll('.additional-guest-input').length;
+        const totalCount = checkedCount + additionalGuestsCount;
+        afterPartyAdults.value = totalCount;
     }
 
     // Event listeners for guest count changes
     adultsInput.addEventListener('input', generateGuestInputs);
-    
-    if (afterPartyAdults) {
-        afterPartyAdults.addEventListener('input', generateAfterPartyGuestInputs);
-    }
 
     // Handle wedding RSVP form submission
     weddingForm.addEventListener('submit', function(e) {
@@ -195,6 +426,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Get the primary name for the after party form
         const primaryName = document.getElementById('primary-name').value;
+        
+        // Collect all adult names for after party selection
+        adultNames = [];
+        const adultCount = parseInt(adultsInput.value || 0);
+        for (let i = 1; i <= adultCount; i++) {
+            const adultInput = document.getElementById(`adult-${i}`);
+            if (adultInput && adultInput.value) {
+                adultNames.push(adultInput.value);
+            }
+        }
         
         // Submit the form data
         const formData = new FormData(this);
@@ -216,6 +457,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Set the primary name in after party form
             document.getElementById('after-party-primary-name').value = primaryName;
             
+            // Generate after party checkboxes with the adult names
+            generateAfterPartyGuestInputs();
+            
             // Scroll to after party form
             afterPartyRsvpForm.scrollIntoView({ behavior: 'smooth' });
         }).catch(error => {
@@ -224,6 +468,7 @@ document.addEventListener('DOMContentLoaded', function() {
             mainRsvpForm.style.display = 'none';
             afterPartyRsvpForm.style.display = 'block';
             document.getElementById('after-party-primary-name').value = primaryName;
+            generateAfterPartyGuestInputs();
             afterPartyRsvpForm.scrollIntoView({ behavior: 'smooth' });
         });
         
@@ -277,7 +522,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function resetMainForm() {
         adultsInput.value = '';
-        childrenInput.value = '';
+        childrenUnder10Input.value = '';
+        children10PlusInput.value = '';
         guestList.innerHTML = '';
     }
 
@@ -316,7 +562,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Language Toggle Functionality
-let currentLanguage = 'en'; // Initial state is English
+// currentLanguage already declared at top of file
 
 const translations = {
     en: {
@@ -345,8 +591,8 @@ const translations = {
         
         // Q&A Section
         'qa-title': 'You have questions? We have answers;',
-        'attire-text': 'Attire: We kindly request that our guests adhere to a formal dress code for our wedding celebration',
-        'children-text': "Children Policy: We love your children, we have kid's room reserved up to 30 of your kiddos",
+        'attire-text': 'Attire: We kindly request that our guests adhere to a formal dress code for our wedding celebration. Please refrain from wearing white.',
+        'children-text': "Children Policy: We love your children, we have kid's room reserved up to 70 of your kiddos",
         'gifts-text': 'Gifts: Your presence is the greatest gift we could ask for. If you wish to honor us with a gift, we kindly request no boxed gifts',
         'refreshments-text': 'Refreshments: Snacks and refreshments, including cocktails and signature drinks, will be available in the lobby starting at 5:00 PM',
         'rsvp-request-text': 'RSVP Request: Please RSVP by November 25th to ensure we can plan accordingly for your presence',
@@ -374,8 +620,10 @@ const translations = {
         'attendance-no': 'Sorry, can\'t make it',
         'adults-label': 'Number of Adults:',
         'adults-placeholder': 'How many adults total?',
-        'children-label': 'Number of Children:',
-        'children-placeholder': 'How many children total?',
+        'children-under-10-label': 'Number of Children Under 10: (no seat provided)',
+        'children-under-10-placeholder': 'Children under 10 years old',
+        'children-10-plus-label': 'Number of Children 10 and Over: (seat provided)',
+        'children-10-plus-placeholder': 'Children 10+ years old',
         'guest-names-title': 'Please provide first and last names of all attending guests:',
         'submit-wedding': 'Submit Wedding RSVP',
         'wedding-success-title': '✅ Thank you for your wedding RSVP!',
@@ -421,8 +669,8 @@ const translations = {
         
         // Q&A Section
         'qa-title': '¿Tienes preguntas? Tenemos respuestas;',
-        'attire-text': 'Vestimenta: Pedimos cordialmente que nuestros invitados sigan un código de vestimenta formal para nuestra celebración de bodas',
-        'children-text': 'Política de Niños: Amamos a sus niños, tenemos una sala para niños reservada para hasta 30 de sus pequeños',
+        'attire-text': 'Vestimenta: Pedimos cordialmente que nuestros invitados sigan un código de vestimenta formal para nuestra celebración de bodas. Por favor absténganse de usar blanco.',
+        'children-text': 'Política de Niños: Amamos a sus niños, tenemos una sala para niños reservada para hasta 70 de sus pequeños',
         'gifts-text': 'Regalos: Su presencia es el regalo más grande que podríamos pedir. Si desean honrarnos con un regalo, pedimos cordialmente que no sean regalos empacados',
         'refreshments-text': 'Refrescos: Bocadillos y refrescos, incluyendo cocteles y bebidas especiales, estarán disponibles en el vestíbulo a partir de las 5:00 PM',
         'rsvp-request-text': 'Solicitud de RSVP: Por favor confirme su asistencia antes del 25 de noviembre para que podamos planificar adecuadamente',
@@ -450,8 +698,10 @@ const translations = {
         'attendance-no': 'Lo siento, no puedo ir',
         'adults-label': 'Número de Adultos:',
         'adults-placeholder': '¿Cuántos adultos en total?',
-        'children-label': 'Número de Niños:',
-        'children-placeholder': '¿Cuántos niños en total?',
+        'children-under-10-label': 'Número de Niños Menores de 10: (sin asiento)',
+        'children-under-10-placeholder': 'Niños menores de 10 años',
+        'children-10-plus-label': 'Número de Niños de 10 y Mayores: (asiento incluido)',
+        'children-10-plus-placeholder': 'Niños de 10+ años',
         'guest-names-title': 'Por favor proporciona nombres y apellidos de todos los invitados que asistirán:',
         'submit-wedding': 'Enviar Confirmación de Boda',
         'wedding-success-title': '✅ ¡Gracias por confirmar tu asistencia a la boda!',
@@ -525,6 +775,8 @@ function updateDynamicGuestInputs(language) {
 // Language toggle event listener
 document.addEventListener('DOMContentLoaded', function() {
     const languageToggle = document.getElementById('language-toggle');
+    if (!languageToggle) return;
+    
     const langFlag = languageToggle.querySelector('.lang-flag');
     const langText = languageToggle.querySelector('.lang-text');
     
@@ -542,6 +794,10 @@ document.addEventListener('DOMContentLoaded', function() {
             langText.textContent = 'ES';
             translatePage('en');
         }
+        
+        // Save language selection to session storage
+        sessionStorage.setItem('languageSelected', 'true');
+        sessionStorage.setItem('selectedLanguage', currentLanguage);
         
         // Close mobile menu after language toggle (same as nav links)
         const navList = document.querySelector('.nav-list');

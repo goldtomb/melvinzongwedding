@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://kit.fontawesome.com/588a463829.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="./css/styles.css" />
+    <title>RSVP - Melvin & Zong's Wedding</title>
+  </head>
+  <body>
+    <!-- Language Selection Overlay -->
+    <div id="language-overlay" class="language-overlay">
+      <div class="language-selection">
+        <h1>Welcome to Our Wedding</h1>
+        <h2>Bienvenidos a Nuestra Boda</h2>
+        <p>Please select your language / Por favor seleccione su idioma</p>
+        <div class="language-buttons">
+          <button class="lang-btn" data-lang="en">English</button>
+          <button class="lang-btn" data-lang="es">Español</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container header light" id="home">
+      <nav class="nav-bar">
+        <div class="nav-brand"><a class="nav-link" href="index.html"> Melvin & Zong</a></div>
+        <ul class="nav-list">
+          <li><a class="nav-link" href="index.html#countdown" data-translate="nav-countdown">Countdown</a></li>
+          <li><a class="nav-link" href="index.html#story" data-translate="nav-story">Our Story</a></li>
+          <li><a class="nav-link" href="index.html#info" data-translate="nav-qa">Q / A</a></li>
+          <li><a class="nav-link" href="index.html#parking" data-translate="nav-parking">Parking</a></li>
+          <li><a class="nav-link" href="index.html#itinerary" data-translate="nav-itinerary">Itinerary</a></li>
+          <li><a class="nav-link" href="rsvp.html" data-translate="nav-rsvp">RSVP</a></li>
+          <li>
+            <button id="language-toggle" class="language-btn">
+              <span class="lang-flag flag-gt"></span>
+              <span class="lang-text">ES</span>
+            </button>
+          </li>
+        </ul>
+
+        <div class="toggle-menu">
+          <i class="fa-solid fa-bars"></i>
+        </div>
+      </nav>
+    </div>
+
+    <div class="container rsvp light" id="rsvp">
+      <h1 data-translate="rsvp-title">RSVP</h1>
+      <div class="row">
+        <div class="col">
+          <!-- Main Wedding RSVP Form -->
+          <div id="main-rsvp-form">
+            <form
+              id="wedding-rsvp"
+              action="https://script.google.com/macros/s/AKfycbwBvA3tg8vX4Wjf0XmfyoJnf1JWdX2SV6sS7Sj3VqcEbHf-sgeY0YwM5CXCEGhOnNv-/exec"
+              method="POST"
+              class="rsvp-form"
+            >
+              <!-- Google Apps Script Web App URL -->
+              <input
+                type="hidden"
+                name="form_type"
+                value="wedding"
+              />
+
+              <!-- Wedding RSVP Section -->
+              <h2 data-translate="wedding-rsvp-title">Wedding Celebration RSVP</h2>
+              
+              <label for="primary-name" data-translate="primary-name-label">Primary Contact Name:</label>
+              <input type="text" id="primary-name" name="primary_name" data-translate-placeholder="primary-name-placeholder" placeholder="Your full name" required />
+
+              <label for="attendance" data-translate="attendance-label">Will you attend our wedding?</label>
+              <select id="attendance" name="attendance" required>
+                <option value="" data-translate="please-select">Please select</option>
+                <option value="yes" data-translate="attendance-yes">Yes, I'll be there!</option>
+                <option value="no" data-translate="attendance-no">Sorry, can't make it</option>
+              </select>
+
+              <div id="attendance-details" style="display: none;">
+                <label for="adults" data-translate="adults-label">Number of Adults:</label>
+                <input
+                  type="number"
+                  id="adults"
+                  name="adults"
+                  min="0"
+                  max="10"
+                  data-translate-placeholder="adults-placeholder"
+                  placeholder="How many adults total?"
+                />
+                
+                <label for="children-under-10" data-translate="children-under-10-label">Number of Children Under 10: (no seat provided)</label>
+                <input
+                  type="number"
+                  id="children-under-10"
+                  name="children_under_10"
+                  min="0"
+                  max="10"
+                  data-translate-placeholder="children-under-10-placeholder"
+                  placeholder="Children under 10 years old"
+                />
+                
+                <label for="children-10-plus" data-translate="children-10-plus-label">Number of Children 10 and Over: (seat provided)</label>
+                <input
+                  type="number"
+                  id="children-10-plus"
+                  name="children_10_plus"
+                  min="0"
+                  max="10"
+                  data-translate-placeholder="children-10-plus-placeholder"
+                  placeholder="Children 10+ years old"
+                />
+                
+
+                <div id="guest-names">
+                  <h3 data-translate="guest-names-title">Please provide first and last names of all attending adults:</h3>
+                  <div id="guest-list">
+                    <!-- Guest name inputs will be dynamically added here -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Honeypot Spam Protection -->
+              <input
+                type="checkbox"
+                name="botcheck"
+                class="hidden"
+                style="display: none"
+              />
+
+              <!-- Custom Confirmation / Success Page -->
+              <!-- <input type="hidden" name="redirect" value="https://mywebsite.com/thanks.html"> -->
+
+              <button class="btn-link dark" type="submit" data-translate="submit-wedding">Submit Wedding RSVP</button>
+            </form>
+          </div>
+
+          <!-- After Party RSVP Form (Hidden initially) -->
+          <div id="after-party-rsvp-form" style="display: none;">
+            <div class="rsvp-success-message">
+              <h2 data-translate="wedding-success-title">✅ Thank you for your wedding RSVP!</h2>
+              <p data-translate="wedding-success-message">We're excited to celebrate with you!</p>
+            </div>
+
+            <form
+              id="after-party-rsvp"
+              action="https://script.google.com/macros/s/AKfycbwBvA3tg8vX4Wjf0XmfyoJnf1JWdX2SV6sS7Sj3VqcEbHf-sgeY0YwM5CXCEGhOnNv-/exec"
+              method="POST"
+              class="rsvp-form after-party-form"
+            >
+              <!-- Google Apps Script Web App URL -->
+              <!-- Hidden field to identify this as after party RSVP -->
+              <input type="hidden" name="form_type" value="after_party" />
+              <input type="hidden" id="after-party-primary-name" name="primary_name" value="" />
+
+              <div class="after-party-section">
+                <h2 data-translate="after-party-title">After Party RSVP (Adults 21+ Only)</h2>
+                <div class="after-party-info">
+                  <p data-translate="after-party-info">If enough guests show interest for after party, it'll be held at <strong>Cilantro's Mexican Restaurant & Bar</strong> 
+                  (0.2 miles from our event, ~4 minute walk). We'll confirm closer to date for those that are interested. 
+                  Cilantro's will continue with Banda and DJ music.</p>
+                </div>
+
+                <label for="after-party-attendance" data-translate="after-party-interest">Are you interested in the after party?</label>
+                <select id="after-party-attendance" name="after_party_attendance" required>
+                  <option value="" data-translate="please-select">Please select</option>
+                  <option value="yes" data-translate="after-party-yes">Yes, I'm interested!</option>
+                  <option value="no" data-translate="after-party-no">No, just the wedding for me</option>
+                </select>
+
+                <div id="after-party-details" style="display: none;">
+                  <!-- Hidden field to store the count, will be auto-updated by checkboxes -->
+                  <input type="hidden" id="after-party-adults" name="after_party_adults" value="0" />
+                  
+                  <div id="after-party-guest-names">
+                    <div id="after-party-guest-list">
+                      <!-- After party guest checkboxes will be dynamically added here -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Honeypot Spam Protection -->
+              <input
+                type="checkbox"
+                name="botcheck"
+                class="hidden"
+                style="display: none"
+              />
+
+              <button class="btn-link dark" type="submit" data-translate="submit-after-party">Submit After Party RSVP</button>
+            </form>
+          </div>
+
+          <!-- Final Success Message (Hidden initially) -->
+          <div id="final-success" style="display: none;">
+            <h2 data-translate="final-success-title">🎉 All RSVPs Complete!</h2>
+            <p data-translate="final-success-message1">Thank you for taking the time to RSVP. We can't wait to celebrate with you!</p>
+            <p data-translate="final-success-message2">We'll be in touch with more details as the date approaches.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer>
+      <div class="container dark">
+        <div class="row">
+          <div class="col">
+            <h1>2026.</h1>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="./scripts.js"></script>
+  </body>
+</html>
