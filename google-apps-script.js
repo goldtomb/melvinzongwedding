@@ -16,13 +16,18 @@ function doPost(e) {
         data.attendance || ''
       ];
       
-      // Add separate columns for adults and children
+      // Add separate columns for adults and children counts
       var adultCount = parseInt(data.adults || 0);
       var childrenUnder10 = parseInt(data.children_under_10 || 0);
       var children10Plus = parseInt(data.children_10_plus || 0);
+      
       row.push(adultCount);
       row.push(childrenUnder10);
       row.push(children10Plus);
+      
+      // Calculate total guest count
+      var totalGuests = adultCount + childrenUnder10 + children10Plus;
+      row.push(totalGuests);
       
       // Collect all adult names and combine into one column
       var adultNames = [];
@@ -79,14 +84,15 @@ function getOrCreateSheet(spreadsheet, sheetName, formType) {
     
     // Set up headers based on form type
     if (formType === 'wedding') {
-      // Create headers with single column for all adult names
+      // Create headers with separate columns for different age groups
       var headers = [
         'Timestamp',
         'Primary Name', 
         'Attendance',
         'Adults Count',
-        'Children Under 10',
-        'Children 10+',
+        'Children Under 10 (No Seat)',
+        'Children 10+ (Seat Provided)', 
+        'Total Guests',
         'Adult Names'
       ];
       
