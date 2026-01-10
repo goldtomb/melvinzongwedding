@@ -4,6 +4,21 @@ function doPost(e) {
     var data = e.parameter;
     var formType = data.form_type || 'wedding';
     
+    // Bot protection: Check honeypot field
+    if (data.botcheck && data.botcheck !== '') {
+      console.log('Bot detected: honeypot field filled');
+      return ContentService.createTextOutput(JSON.stringify({success: false, error: 'Submission rejected'}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // Rate limiting: Check for rapid submissions from same name
+    var primaryName = data.primary_name || '';
+    if (primaryName && isRapidSubmission(spreadsheet, primaryName, formType)) {
+      console.log('Rate limit exceeded for: ' + primaryName);
+      return ContentService.createTextOutput(JSON.stringify({success: false, error: 'Please wait before submitting again'}))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
     // Create or get the appropriate sheet based on form type
     var sheetName = formType === 'after_party' ? 'After Party RSVPs' : 'Wedding RSVPs';
     var sheet = getOrCreateSheet(spreadsheet, sheetName, formType);
@@ -41,6 +56,8 @@ function doPost(e) {
       
       sheet.appendRow(row);
       
+      // Wedding RSVP submitted - email will be sent after after-party RSVP
+      
     } else if (formType === 'after_party') {
       // Handle After Party RSVP
       var row = [
@@ -64,6 +81,9 @@ function doPost(e) {
       row.push(guestNames.join(', '));
       
       sheet.appendRow(row);
+      
+      // Send combined email notification with both wedding and after-party data
+      sendCombinedEmailNotification(spreadsheet, data.primary_name || 'Unknown Guest');
     }
     
     return ContentService.createTextOutput(JSON.stringify({success: true, formType: formType}))
@@ -121,4 +141,238 @@ function getOrCreateSheet(spreadsheet, sheetName, formType) {
   }
   
   return sheet;
+}
+
+function isRapidSubmission(spreadsheet, primaryName, formType) {
+  try {
+    var sheetName = formType === 'after_party' ? 'After Party RSVPs' : 'Wedding RSVPs';
+    var sheet = spreadsheet.getSheetByName(sheetName);
+    
+    if (!sheet) return false;
+    
+    var now = new Date();
+    var fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000); // 5 minutes ago
+    
+    var data = sheet.getDataRange().getValues();
+    var recentSubmissions = 0;
+    
+    // Skip header row, check last 20 rows for performance
+    var startRow = Math.max(1, data.length - 20);
+    
+    for (var i = startRow; i < data.length; i++) {
+      var timestamp = data[i][0];
+      var name = data[i][1];
+      
+      if (timestamp instanceof Date && 
+          timestamp > fiveMinutesAgo && 
+          name === primaryName) {
+        recentSubmissions++;
+        if (recentSubmissions >= 2) {
+          return true; // More than 1 submission in 5 minutes
+        }
+      }
+    }
+    
+    return false;
+  } catch (error) {
+    console.log('Rate limiting check failed: ' + error.toString());
+    return false; // Don't block on error
+  }
+}
+
+function sendCombinedEmailNotification(spreadsheet, primaryName) {
+  try {
+    // Configure your notification email here
+    var notificationEmail = 'melvin.abzun.dev@gmail.com';
+    
+    // Get both wedding and after-party data
+    var weddingData = getLatestSubmission(spreadsheet, 'Wedding RSVPs', primaryName);
+    var afterPartyData = getLatestSubmission(spreadsheet, 'After Party RSVPs', primaryName);
+    
+    var subject = '💒🎉 Complete RSVP Received - ' + primaryName;
+    
+    var body = 'Complete RSVP Response Received!\n\n';
+    body += '👤 Guest: ' + primaryName + '\n';
+    body += '📅 Completed: ' + new Date().toLocaleString() + '\n\n';
+    
+    // Wedding RSVP Section
+    if (weddingData) {
+      body += '💒 WEDDING RSVP\n';
+      body += '═══════════════════\n';
+      body += '✅ Attendance: ' + (weddingData.attendance || 'Not specified') + '\n';
+      
+      if (weddingData.attendance && weddingData.attendance.toLowerCase() === 'yes') {
+        var totalGuests = parseInt(weddingData.adults || 0) + parseInt(weddingData.children_under_10 || 0) + parseInt(weddingData.children_10_plus || 0);
+        body += '👥 Total Guests: ' + totalGuests + '\n';
+        body += '   - Adults: ' + (weddingData.adults || '0') + '\n';
+        body += '   - Children Under 10: ' + (weddingData.children_under_10 || '0') + '\n';
+        body += '   - Children 10+: ' + (weddingData.children_10_plus || '0') + '\n';
+        
+        // Add adult names if provided
+        var adultNames = [];
+        for (var i = 1; i <= 10; i++) {
+          var adultName = weddingData['adult_' + i] || '';
+          if (adultName) {
+            adultNames.push(adultName);
+          }
+        }
+        if (adultNames.length > 0) {
+          body += '📝 Adult Names: ' + adultNames.join(', ') + '\n';
+        }
+      }
+    } else {
+      body += '💒 WEDDING RSVP: Not found\n';
+    }
+    
+    body += '\n';
+    
+    // After Party Section
+    if (afterPartyData) {
+      body += '🎉 AFTER PARTY RSVP\n';
+      body += '═══════════════════\n';
+      body += '🎊 Attendance: ' + (afterPartyData.after_party_attendance || 'Not specified') + '\n';
+      
+      if (afterPartyData.after_party_attendance && afterPartyData.after_party_attendance.toLowerCase() === 'yes') {
+        body += '👥 Adults 21+: ' + (afterPartyData.after_party_adults || '0') + '\n';
+        
+        // Add guest names if provided
+        var guestNames = [];
+        for (var i = 1; i <= 10; i++) {
+          var guestName = afterPartyData['after_party_guest_' + i] || '';
+          if (guestName) {
+            guestNames.push(guestName);
+          }
+        }
+        if (guestNames.length > 0) {
+          body += '📝 Guest Names: ' + guestNames.join(', ') + '\n';
+        }
+      }
+    } else {
+      body += '🎉 AFTER PARTY RSVP: Not found\n';
+    }
+    
+    body += '\n📊 View all responses: https://docs.google.com/spreadsheets/d/1J79a68jGtJOpT4UqIui2xQ05Y_G1U20wFVH4vi1RKtQ';
+    
+    GmailApp.sendEmail(notificationEmail, subject, body);
+    
+  } catch (error) {
+    console.log('Email notification failed: ' + error.toString());
+    // Don't throw error - submission should still succeed even if email fails
+  }
+}
+
+function getLatestSubmission(spreadsheet, sheetName, primaryName) {
+  try {
+    var sheet = spreadsheet.getSheetByName(sheetName);
+    if (!sheet) return null;
+    
+    var data = sheet.getDataRange().getValues();
+    
+    // Search from bottom up for latest submission from this person
+    for (var i = data.length - 1; i > 0; i--) { // Start from last row, skip header
+      var name = data[i][1]; // Primary name is in column B (index 1)
+      if (name === primaryName) {
+        // Found the submission, convert row to object
+        var headers = data[0];
+        var submission = {};
+        
+        // Map basic fields
+        submission.timestamp = data[i][0];
+        submission.primary_name = data[i][1];
+        
+        if (sheetName === 'Wedding RSVPs') {
+          submission.attendance = data[i][2];
+          submission.adults = data[i][3];
+          submission.children_under_10 = data[i][4];
+          submission.children_10_plus = data[i][5];
+          // Adult names are in the last column as a string
+          var adultNamesString = data[i][7] || '';
+          var adultNamesArray = adultNamesString.split(', ').filter(function(name) { return name.trim() !== ''; });
+          for (var j = 0; j < adultNamesArray.length && j < 10; j++) {
+            submission['adult_' + (j + 1)] = adultNamesArray[j];
+          }
+        } else if (sheetName === 'After Party RSVPs') {
+          submission.after_party_attendance = data[i][2];
+          submission.after_party_adults = data[i][3];
+          // Guest names are in the last column as a string
+          var guestNamesString = data[i][4] || '';
+          var guestNamesArray = guestNamesString.split(', ').filter(function(name) { return name.trim() !== ''; });
+          for (var j = 0; j < guestNamesArray.length && j < 10; j++) {
+            submission['after_party_guest_' + (j + 1)] = guestNamesArray[j];
+          }
+        }
+        
+        return submission;
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.log('Error getting latest submission: ' + error.toString());
+    return null;
+  }
+}
+
+function sendEmailNotification(formType, data) {
+  try {
+    // Configure your notification email here
+    var notificationEmail = 'melvin.abzun.dev@gmail.com'; // Replace with your email
+    
+    var subject = formType === 'after_party' 
+      ? '🎉 New After Party RSVP - ' + (data.primary_name || 'Unknown')
+      : '💒 New Wedding RSVP - ' + (data.primary_name || 'Unknown');
+    
+    var body = '';
+    
+    if (formType === 'wedding') {
+      var totalGuests = parseInt(data.adults || 0) + parseInt(data.children_under_10 || 0) + parseInt(data.children_10_plus || 0);
+      
+      body = 'New Wedding RSVP Received!\n\n' +
+             '👤 Primary Name: ' + (data.primary_name || 'Not provided') + '\n' +
+             '✅ Attendance: ' + (data.attendance || 'Not specified') + '\n' +
+             '👥 Total Guests: ' + totalGuests + '\n' +
+             '   - Adults: ' + (data.adults || '0') + '\n' +
+             '   - Children Under 10: ' + (data.children_under_10 || '0') + '\n' +
+             '   - Children 10+: ' + (data.children_10_plus || '0') + '\n\n';
+      
+      // Add adult names if provided
+      var adultNames = [];
+      for (var i = 1; i <= 10; i++) {
+        var adultName = data['adult_' + i] || '';
+        if (adultName) {
+          adultNames.push(adultName);
+        }
+      }
+      if (adultNames.length > 0) {
+        body += '📝 Adult Names: ' + adultNames.join(', ') + '\n';
+      }
+      
+    } else if (formType === 'after_party') {
+      body = 'New After Party RSVP Received!\n\n' +
+             '👤 Primary Name: ' + (data.primary_name || 'Not provided') + '\n' +
+             '🎊 After Party Attendance: ' + (data.after_party_attendance || 'Not specified') + '\n' +
+             '👥 Adults 21+: ' + (data.after_party_adults || '0') + '\n\n';
+      
+      // Add guest names if provided
+      var guestNames = [];
+      for (var i = 1; i <= 10; i++) {
+        var guestName = data['after_party_guest_' + i] || '';
+        if (guestName) {
+          guestNames.push(guestName);
+        }
+      }
+      if (guestNames.length > 0) {
+        body += '📝 Guest Names: ' + guestNames.join(', ') + '\n';
+      }
+    }
+    
+    body += '\n📅 Submitted: ' + new Date().toLocaleString() + '\n' +
+            '📊 View responses: https://docs.google.com/spreadsheets/d/1J79a68jGtJOpT4UqIui2xQ05Y_G1U20wFVH4vi1RKtQ';
+    
+    GmailApp.sendEmail(notificationEmail, subject, body);
+    
+  } catch (error) {
+    console.log('Email notification failed: ' + error.toString());
+    // Don't throw error - submission should still succeed even if email fails
+  }
 }

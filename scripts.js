@@ -6,6 +6,12 @@ const navList = document.querySelector('.nav-list')
 const navLinks = document.querySelectorAll('.nav-link')
 const icon = document.getElementsByTagName('i');
 
+// Initialize form security tracking
+let formLoadTime = Date.now();
+let submissionAttempts = 0;
+const maxSubmissionAttempts = 3;
+const minFormFillTime = 5000; // 5 seconds minimum
+
 // Initialize language variable
 let currentLanguage = 'en';
 
@@ -418,8 +424,25 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault(); // Prevent default form submission
         e.stopPropagation(); // Stop event bubbling
         
+        // Bot protection: Check form fill time
+        const formFillTime = Date.now() - formLoadTime;
+        if (formFillTime < minFormFillTime) {
+            console.log('Suspicious: Form filled too quickly');
+            return false;
+        }
+        
+        // Rate limiting: Check submission attempts
+        submissionAttempts++;
+        if (submissionAttempts > maxSubmissionAttempts) {
+            console.log('Too many submission attempts');
+            return false;
+        }
+        
         // Disable submit button to prevent double submissions
         const submitButton = this.querySelector('button[type="submit"]');
+        if (submitButton.disabled) {
+            return false; // Already submitting
+        }
         const originalText = submitButton.textContent;
         submitButton.disabled = true;
         submitButton.textContent = 'Submitting...';
@@ -450,9 +473,25 @@ document.addEventListener('DOMContentLoaded', function() {
             }),
             timeoutPromise
         ]).then(response => {
+            // Check if submission was rejected due to bot protection
+            if (response && response.ok) {
+                response.json().then(result => {
+                    if (result.success === false) {
+                        console.log('Submission rejected:', result.error);
+                        // Re-enable submit button
+                        submitButton.disabled = false;
+                        submitButton.textContent = originalText;
+                        return;
+                    }
+                });
+            }
+            
             // Hide main form and show after party form regardless
             mainRsvpForm.style.display = 'none';
             afterPartyRsvpForm.style.display = 'block';
+            
+            // Reset form load time for after-party form
+            formLoadTime = Date.now();
             
             // Set the primary name in after party form
             document.getElementById('after-party-primary-name').value = primaryName;
@@ -483,6 +522,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Disable submit button to prevent double submissions
             const submitButton = this.querySelector('button[type="submit"]');
+            if (submitButton.disabled) {
+                return false; // Already submitting
+            }
             const originalText = submitButton.textContent;
             submitButton.disabled = true;
             submitButton.textContent = 'Submitting...';
@@ -595,7 +637,7 @@ const translations = {
         'children-text': "Children Policy: We love your children, we have kid's room reserved up to 70 of your kiddos",
         'gifts-text': 'Gifts: Your presence is the greatest gift we could ask for. If you wish to honor us with a gift, we kindly request no boxed gifts',
         'refreshments-text': 'Refreshments: Snacks and refreshments, including cocktails and signature drinks, will be available in the lobby starting at 5:00 PM',
-        'rsvp-request-text': 'RSVP Request: Please RSVP by November 25th to ensure we can plan accordingly for your presence',
+        'rsvp-request-text': 'RSVP Request: Please RSVP by February 28th to ensure we can plan accordingly for your presence',
         
         // Parking
         'parking-title': 'Parking:',
@@ -624,7 +666,7 @@ const translations = {
         'children-under-10-placeholder': 'Children under 10 years old',
         'children-10-plus-label': 'Number of Children 10 and Over: (seat provided)',
         'children-10-plus-placeholder': 'Children 10+ years old',
-        'guest-names-title': 'Please provide first and last names of all attending guests:',
+        'guest-names-title': 'Please provide first and last names of all attending adults:',
         'submit-wedding': 'Submit Wedding RSVP',
         'wedding-success-title': '✅ Thank you for your wedding RSVP!',
         'wedding-success-message': 'We\'re excited to celebrate with you!',
@@ -673,7 +715,7 @@ const translations = {
         'children-text': 'Política de Niños: Amamos a sus niños, tenemos una sala para niños reservada para hasta 70 de sus pequeños',
         'gifts-text': 'Regalos: Su presencia es el regalo más grande que podríamos pedir. Si desean honrarnos con un regalo, pedimos cordialmente que no sean regalos empacados',
         'refreshments-text': 'Refrescos: Bocadillos y refrescos, incluyendo cocteles y bebidas especiales, estarán disponibles en el vestíbulo a partir de las 5:00 PM',
-        'rsvp-request-text': 'Solicitud de RSVP: Por favor confirme su asistencia antes del 25 de noviembre para que podamos planificar adecuadamente',
+        'rsvp-request-text': 'Solicitud de RSVP: Por favor confirme su asistencia antes del 28 de febrero para que podamos planificar adecuadamente',
         
         // Parking
         'parking-title': 'Estacionamiento:',
@@ -702,7 +744,7 @@ const translations = {
         'children-under-10-placeholder': 'Niños menores de 10 años',
         'children-10-plus-label': 'Número de Niños de 10 y Mayores: (asiento incluido)',
         'children-10-plus-placeholder': 'Niños de 10+ años',
-        'guest-names-title': 'Por favor proporciona nombres y apellidos de todos los invitados que asistirán:',
+        'guest-names-title': 'Por favor proporciona nombres y apellidos de todos los adultos que asistirán:',
         'submit-wedding': 'Enviar Confirmación de Boda',
         'wedding-success-title': '✅ ¡Gracias por confirmar tu asistencia a la boda!',
         'wedding-success-message': '¡Estamos emocionados de celebrar contigo!',
