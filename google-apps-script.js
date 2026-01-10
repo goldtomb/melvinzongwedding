@@ -1,29 +1,42 @@
 function doPost(e) {
+  console.log('=== SCRIPT EXECUTION STARTED ===');
+  console.log('Request received at:', new Date().toISOString());
+  
   try {
+    console.log('Raw parameters received:', JSON.stringify(e.parameter));
+    
     var spreadsheet = SpreadsheetApp.openById('1J79a68jGtJOpT4UqIui2xQ05Y_G1U20wFVH4vi1RKtQ');
     var data = e.parameter;
     var formType = data.form_type || 'wedding';
     
+    console.log('Form type determined:', formType);
+    console.log('Primary name:', data.primary_name || 'NOT PROVIDED');
+    
     // Bot protection: Check honeypot field
+    console.log('Checking honeypot field. botcheck value:', data.botcheck);
     if (data.botcheck && data.botcheck !== '') {
       console.log('Bot detected: honeypot field filled');
       return ContentService.createTextOutput(JSON.stringify({success: false, error: 'Submission rejected'}))
         .setMimeType(ContentService.MimeType.JSON);
     }
+    console.log('Honeypot check passed');
     
     // Rate limiting: Check for rapid submissions from same name
     var primaryName = data.primary_name || '';
+    console.log('Checking rate limiting for:', primaryName);
     if (primaryName && isRapidSubmission(spreadsheet, primaryName, formType)) {
       console.log('Rate limit exceeded for: ' + primaryName);
       return ContentService.createTextOutput(JSON.stringify({success: false, error: 'Please wait before submitting again'}))
         .setMimeType(ContentService.MimeType.JSON);
     }
+    console.log('Rate limiting check passed');
     
     // Create or get the appropriate sheet based on form type
     var sheetName = formType === 'after_party' ? 'After Party RSVPs' : 'Wedding RSVPs';
     var sheet = getOrCreateSheet(spreadsheet, sheetName, formType);
     
     if (formType === 'wedding') {
+      console.log('Processing WEDDING RSVP');
       // Handle Wedding RSVP
       var row = [
         new Date(), // Timestamp
@@ -55,10 +68,15 @@ function doPost(e) {
       row.push(adultNames.join(', '));
       
       sheet.appendRow(row);
+      console.log('Wedding RSVP data saved to sheet');
       
-      // Wedding RSVP submitted - email will be sent after after-party RSVP
+      // Send immediate wedding RSVP email notification
+      console.log('About to send wedding RSVP email...');
+      sendEmailNotification('wedding', data);
+      console.log('Wedding email notification function called');
       
     } else if (formType === 'after_party') {
+      console.log('Processing AFTER PARTY RSVP');
       // Handle After Party RSVP
       var row = [
         new Date(), // Timestamp
@@ -81,15 +99,26 @@ function doPost(e) {
       row.push(guestNames.join(', '));
       
       sheet.appendRow(row);
+      console.log('After party RSVP data saved to sheet');
       
-      // Send combined email notification with both wedding and after-party data
-      sendCombinedEmailNotification(spreadsheet, data.primary_name || 'Unknown Guest');
+      // Send immediate after-party RSVP email notification
+      console.log('About to send after-party RSVP email...');
+      sendEmailNotification('after_party', data);
+      console.log('After-party email notification function called');
+    } else {
+      console.log('Unknown form type:', formType);
     }
     
-    return ContentService.createTextOutput(JSON.stringify({success: true, formType: formType}))
+    console.log('Preparing response...');
+    var response = ContentService.createTextOutput(JSON.stringify({success: true, formType: formType}))
       .setMimeType(ContentService.MimeType.JSON);
+    console.log('=== SCRIPT EXECUTION COMPLETED SUCCESSFULLY ===');
+    return response;
       
   } catch (error) {
+    console.error('=== SCRIPT EXECUTION FAILED ===');
+    console.error('Error details:', error.toString());
+    console.error('Stack trace:', error.stack);
     return ContentService.createTextOutput(JSON.stringify({success: false, error: error.toString()}))
       .setMimeType(ContentService.MimeType.JSON);
   }
@@ -182,12 +211,18 @@ function isRapidSubmission(spreadsheet, primaryName, formType) {
 
 function sendCombinedEmailNotification(spreadsheet, primaryName) {
   try {
+    console.log('Starting email notification for: ' + primaryName);
+    
     // Configure your notification email here
     var notificationEmail = 'melvin.abzun.dev@gmail.com';
+    console.log('Notification email: ' + notificationEmail);
     
     // Get both wedding and after-party data
     var weddingData = getLatestSubmission(spreadsheet, 'Wedding RSVPs', primaryName);
     var afterPartyData = getLatestSubmission(spreadsheet, 'After Party RSVPs', primaryName);
+    
+    console.log('Wedding data found: ' + (weddingData ? 'Yes' : 'No'));
+    console.log('After party data found: ' + (afterPartyData ? 'Yes' : 'No'));
     
     var subject = '💒🎉 Complete RSVP Received - ' + primaryName;
     
@@ -253,10 +288,16 @@ function sendCombinedEmailNotification(spreadsheet, primaryName) {
     
     body += '\n📊 View all responses: https://docs.google.com/spreadsheets/d/1J79a68jGtJOpT4UqIui2xQ05Y_G1U20wFVH4vi1RKtQ';
     
+    console.log('About to send email with subject: ' + subject);
+    console.log('Email body length: ' + body.length);
+    
     GmailApp.sendEmail(notificationEmail, subject, body);
     
+    console.log('Email sent successfully');
+    
   } catch (error) {
-    console.log('Email notification failed: ' + error.toString());
+    console.error('Email notification failed: ' + error.toString());
+    console.error('Stack trace: ' + error.stack);
     // Don't throw error - submission should still succeed even if email fails
   }
 }
@@ -315,22 +356,27 @@ function getLatestSubmission(spreadsheet, sheetName, primaryName) {
 
 function sendEmailNotification(formType, data) {
   try {
+    console.log('Starting ' + formType + ' email notification');
+    console.log('Email data received:', JSON.stringify(data));
+    
     // Configure your notification email here
-    var notificationEmail = 'melvin.abzun.dev@gmail.com'; // Replace with your email
+    var notificationEmail = 'jesus.barragan.dev@gmail.com';
+    console.log('Sending to:', notificationEmail);
     
     var subject = formType === 'after_party' 
-      ? '🎉 New After Party RSVP - ' + (data.primary_name || 'Unknown')
-      : '💒 New Wedding RSVP - ' + (data.primary_name || 'Unknown');
+      ? 'After Party RSVP - ' + (data.primary_name || 'Unknown')
+      : 'Wedding RSVP - ' + (data.primary_name || 'Unknown');
     
     var body = '';
     
     if (formType === 'wedding') {
+      console.log('Preparing wedding email body...');
       var totalGuests = parseInt(data.adults || 0) + parseInt(data.children_under_10 || 0) + parseInt(data.children_10_plus || 0);
       
       body = 'New Wedding RSVP Received!\n\n' +
-             '👤 Primary Name: ' + (data.primary_name || 'Not provided') + '\n' +
-             '✅ Attendance: ' + (data.attendance || 'Not specified') + '\n' +
-             '👥 Total Guests: ' + totalGuests + '\n' +
+             'Primary Name: ' + (data.primary_name || 'Not provided') + '\n' +
+             'Attendance: ' + (data.attendance || 'Not specified') + '\n' +
+             'Total Guests: ' + totalGuests + '\n' +
              '   - Adults: ' + (data.adults || '0') + '\n' +
              '   - Children Under 10: ' + (data.children_under_10 || '0') + '\n' +
              '   - Children 10+: ' + (data.children_10_plus || '0') + '\n\n';
@@ -344,14 +390,15 @@ function sendEmailNotification(formType, data) {
         }
       }
       if (adultNames.length > 0) {
-        body += '📝 Adult Names: ' + adultNames.join(', ') + '\n';
+        body += 'Adult Names: ' + adultNames.join(', ') + '\n';
       }
       
     } else if (formType === 'after_party') {
+      console.log('Preparing after-party email body...');
       body = 'New After Party RSVP Received!\n\n' +
-             '👤 Primary Name: ' + (data.primary_name || 'Not provided') + '\n' +
-             '🎊 After Party Attendance: ' + (data.after_party_attendance || 'Not specified') + '\n' +
-             '👥 Adults 21+: ' + (data.after_party_adults || '0') + '\n\n';
+             'Primary Name: ' + (data.primary_name || 'Not provided') + '\n' +
+             'After Party Attendance: ' + (data.after_party_attendance || 'Not specified') + '\n' +
+             'Adults 21+: ' + (data.after_party_adults || '0') + '\n\n';
       
       // Add guest names if provided
       var guestNames = [];
@@ -362,17 +409,23 @@ function sendEmailNotification(formType, data) {
         }
       }
       if (guestNames.length > 0) {
-        body += '📝 Guest Names: ' + guestNames.join(', ') + '\n';
+        body += 'Guest Names: ' + guestNames.join(', ') + '\n';
       }
     }
     
-    body += '\n📅 Submitted: ' + new Date().toLocaleString() + '\n' +
-            '📊 View responses: https://docs.google.com/spreadsheets/d/1J79a68jGtJOpT4UqIui2xQ05Y_G1U20wFVH4vi1RKtQ';
+    body += '\nSubmitted: ' + new Date().toLocaleString() + '\n' +
+            'View responses: https://docs.google.com/spreadsheets/d/1J79a68jGtJOpT4UqIui2xQ05Y_G1U20wFVH4vi1RKtQ';
+    
+    console.log('About to send email with subject:', subject);
+    console.log('Body length:', body.length);
     
     GmailApp.sendEmail(notificationEmail, subject, body);
     
+    console.log('Email sent successfully for', formType);
+    
   } catch (error) {
-    console.log('Email notification failed: ' + error.toString());
+    console.error('Email notification failed for ' + formType + ':', error.toString());
+    console.error('Stack trace:', error.stack);
     // Don't throw error - submission should still succeed even if email fails
   }
 }

@@ -460,33 +460,43 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Submit the form data
+        // Submit the form data using iframe to avoid CORS issues
         const formData = new FormData(this);
         
-        // Send the wedding RSVP with timeout
-        const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 5000));
+        // Create a temporary iframe for form submission
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.name = 'temp-iframe-' + Date.now();
+        document.body.appendChild(iframe);
         
-        Promise.race([
-            fetch(this.action, {
-                method: 'POST',
-                body: formData
-            }),
-            timeoutPromise
-        ]).then(response => {
-            // Check if submission was rejected due to bot protection
-            if (response && response.ok) {
-                response.json().then(result => {
-                    if (result.success === false) {
-                        console.log('Submission rejected:', result.error);
-                        // Re-enable submit button
-                        submitButton.disabled = false;
-                        submitButton.textContent = originalText;
-                        return;
-                    }
-                });
-            }
-            
-            // Hide main form and show after party form regardless
+        // Create a temporary form for submission
+        const tempForm = document.createElement('form');
+        tempForm.method = 'POST';
+        tempForm.action = this.action;
+        tempForm.target = iframe.name;
+        tempForm.style.display = 'none';
+        
+        // Copy form data to temp form
+        for (let [key, value] of formData.entries()) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = value;
+            tempForm.appendChild(input);
+        }
+        
+        document.body.appendChild(tempForm);
+        tempForm.submit();
+        
+        // Clean up after a delay
+        setTimeout(() => {
+            document.body.removeChild(iframe);
+            document.body.removeChild(tempForm);
+        }, 1000);
+        
+        // Show after party form after short delay
+        setTimeout(() => {
+            // Hide main form and show after party form
             mainRsvpForm.style.display = 'none';
             afterPartyRsvpForm.style.display = 'block';
             
@@ -501,15 +511,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Scroll to after party form
             afterPartyRsvpForm.scrollIntoView({ behavior: 'smooth' });
-        }).catch(error => {
-            console.error('Error:', error);
-            // Still show after party form - the submission likely went through
-            mainRsvpForm.style.display = 'none';
-            afterPartyRsvpForm.style.display = 'block';
-            document.getElementById('after-party-primary-name').value = primaryName;
-            generateAfterPartyGuestInputs();
-            afterPartyRsvpForm.scrollIntoView({ behavior: 'smooth' });
-        });
+        }, 500);
         
         return false; // Additional prevention of default form submission
     });
@@ -529,34 +531,49 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = true;
             submitButton.textContent = 'Submitting...';
             
-            // Submit the form data
+            // Submit the form data using iframe to avoid CORS issues
             const formData = new FormData(this);
             
-            // Send the after party RSVP
-            fetch(this.action, {
-                method: 'POST',
-                body: formData
-            }).then(response => {
-                if (response.ok) {
-                    // Hide after party form and show final success
-                    afterPartyRsvpForm.style.display = 'none';
-                    finalSuccess.style.display = 'block';
-                    
-                    // Scroll to final success message
-                    finalSuccess.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                    alert('There was an error submitting your after party RSVP. Please try again.');
-                    // Re-enable submit button
-                    submitButton.disabled = false;
-                    submitButton.textContent = originalText;
-                }
-            }).catch(error => {
-                console.error('Error:', error);
-                alert('There was an error submitting your after party RSVP. Please try again.');
-                // Re-enable submit button
-                submitButton.disabled = false;
-                submitButton.textContent = originalText;
-            });
+            // Create a temporary iframe for form submission
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.name = 'temp-iframe-' + Date.now();
+            document.body.appendChild(iframe);
+            
+            // Create a temporary form for submission
+            const tempForm = document.createElement('form');
+            tempForm.method = 'POST';
+            tempForm.action = this.action;
+            tempForm.target = iframe.name;
+            tempForm.style.display = 'none';
+            
+            // Copy form data to temp form
+            for (let [key, value] of formData.entries()) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value;
+                tempForm.appendChild(input);
+            }
+            
+            document.body.appendChild(tempForm);
+            tempForm.submit();
+            
+            // Clean up after a delay
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+                document.body.removeChild(tempForm);
+            }, 1000);
+            
+            // Show final success after short delay
+            setTimeout(() => {
+                // Hide after party form and show final success
+                afterPartyRsvpForm.style.display = 'none';
+                finalSuccess.style.display = 'block';
+                
+                // Scroll to final success message
+                finalSuccess.scrollIntoView({ behavior: 'smooth' });
+            }, 500);
             
             return false; // Additional prevention of default form submission
         });
