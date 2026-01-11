@@ -218,8 +218,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const attendanceSelect = document.getElementById('attendance');
     const attendanceDetails = document.getElementById('attendance-details');
     const adultsInput = document.getElementById('adults');
-    const childrenUnder10Input = document.getElementById('children-under-10');
-    const children10PlusInput = document.getElementById('children-10-plus');
+    const childrenUnder5Input = document.getElementById('children-under-5');
+    const children5PlusInput = document.getElementById('children-5-plus');
     const guestList = document.getElementById('guest-list');
     
     // After party form elements
@@ -509,6 +509,20 @@ document.addEventListener('DOMContentLoaded', function() {
             // Generate after party checkboxes with the adult names
             generateAfterPartyGuestInputs();
             
+            // Focus on the after party form and scroll to it smoothly
+            afterPartyRsvpForm.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+            
+            // Add slight delay then focus on the first form element
+            setTimeout(() => {
+                const firstInput = afterPartyRsvpForm.querySelector('select, input');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            }, 500);
+            
             // Scroll to after party form
             afterPartyRsvpForm.scrollIntoView({ behavior: 'smooth' });
         }, 500);
@@ -581,8 +595,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function resetMainForm() {
         adultsInput.value = '';
-        childrenUnder10Input.value = '';
-        children10PlusInput.value = '';
+        childrenUnder5Input.value = '';
+        children5PlusInput.value = '';
         guestList.innerHTML = '';
     }
 
@@ -645,7 +659,7 @@ const translations = {
         // Story
         'our-story-title': 'Our Story',
         'story-paragraph1': 'Their story began in the least romantic of places: a computer lab. Between glowing screens and quiet focus, something unexpected clicked, more than just the keyboards. That spark soon climbed higher, quite literally, into a treehouse where laughter came easily and a simple hangout turned into the beginning of something real.',
-        'story-paragraph2': 'Their love learned to travel early, winding along the coast with the ocean as their witness and adventure as their guide. Life, of course, had plans of its own. Sending them miles apart to build careers, chase dreams, and grow into the people they were meant to be.',
+        'story-paragraph2': 'Since the summer of 2016, their love learned to travel early, winding along the coast with the ocean as their witness and adventure as their guide. Life, of course, had plans of its own. Sending them miles apart to build careers, chase dreams, and grow into the people they were meant to be.',
         'story-paragraph3': 'Distance tried its best, but love proved stubborn, patient, and very good at long-distance communication. What started with shared screens and shared dreams has become one life, one promise, and one forever. The best stories don\'t follow a straight line, but always find their way home.',
         
         // Q&A Section
@@ -679,10 +693,10 @@ const translations = {
         'attendance-no': 'Sorry, can\'t make it',
         'adults-label': 'Number of Adults:',
         'adults-placeholder': 'How many adults total?',
-        'children-under-10-label': 'Number of Children Under 10: (no seat provided)',
-        'children-under-10-placeholder': 'Children under 10 years old',
-        'children-10-plus-label': 'Number of Children 10 and Over: (seat provided)',
-        'children-10-plus-placeholder': 'Children 10+ years old',
+        'children-under-5-label': 'Number of Children Under 5: (no seat provided)',
+        'children-under-5-placeholder': 'Children under 5 years old',
+        'children-5-plus-label': 'Number of Children 5 and Over: (seat provided)',
+        'children-5-plus-placeholder': 'Children 5+ years old',
         'guest-names-title': 'Please provide first and last names of all attending adults:',
         'submit-wedding': 'Submit Wedding RSVP',
         'wedding-success-title': '✅ Thank you for your wedding RSVP!',
@@ -723,7 +737,7 @@ const translations = {
         // Story
         'our-story-title': 'Nuestra Historia',
         'story-paragraph1': 'Su historia comenzó en el lugar menos romántico: un laboratorio de computadoras. Entre pantallas brillantes y concentración silenciosa, algo inesperado hizo clic, más que solo los teclados. Esa chispa pronto subió más alto, literalmente, a una casa del árbol donde la risa vino fácilmente y una simple reunión se convirtió en el comienzo de algo real.',
-        'story-paragraph2': 'Su amor aprendió a viajar temprano, serpenteando por la costa con el océano como testigo y la aventura como guía. La vida, por supuesto, tenía sus propios planes. Los envió millas de distancia para construir carreras, perseguir sueños y crecer hasta convertirse en las personas que estaban destinados a ser.',
+        'story-paragraph2': 'Desde el verano de 2016, su amor aprendió a viajar temprano, serpenteando por la costa con el océano como testigo y la aventura como guía. La vida, por supuesto, tenía sus propios planes. Los envió millas de distancia para construir carreras, perseguir sueños y crecer hasta convertirse en las personas que estaban destinados a ser.',
         'story-paragraph3': 'La distancia hizo su mejor esfuerzo, pero el amor demostró ser terco, paciente y muy bueno en la comunicación a larga distancia. Lo que comenzó con pantallas compartidas y sueños compartidos se ha convertido en una vida, una promesa y un para siempre. Las mejores historias no siguen una línea recta, pero siempre encuentran su camino a casa.',
         
         // Q&A Section
@@ -757,10 +771,10 @@ const translations = {
         'attendance-no': 'Lo siento, no puedo ir',
         'adults-label': 'Número de Adultos:',
         'adults-placeholder': '¿Cuántos adultos en total?',
-        'children-under-10-label': 'Número de Niños Menores de 10: (sin asiento)',
-        'children-under-10-placeholder': 'Niños menores de 10 años',
-        'children-10-plus-label': 'Número de Niños de 10 y Mayores: (asiento incluido)',
-        'children-10-plus-placeholder': 'Niños de 10+ años',
+        'children-under-5-label': 'Número de Niños Menores de 5: (sin asiento)',
+        'children-under-5-placeholder': 'Niños menores de 5 años',
+        'children-5-plus-label': 'Número de Niños de 5 y Mayores: (asiento incluido)',
+        'children-5-plus-placeholder': 'Niños de 5+ años',
         'guest-names-title': 'Por favor proporciona nombres y apellidos de todos los adultos que asistirán:',
         'submit-wedding': 'Enviar Confirmación de Boda',
         'wedding-success-title': '✅ ¡Gracias por confirmar tu asistencia a la boda!',

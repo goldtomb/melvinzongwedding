@@ -46,15 +46,15 @@ function doPost(e) {
       
       // Add separate columns for adults and children counts
       var adultCount = parseInt(data.adults || 0);
-      var childrenUnder10 = parseInt(data.children_under_10 || 0);
-      var children10Plus = parseInt(data.children_10_plus || 0);
+      var childrenUnder5 = parseInt(data.children_under_5 || 0);
+      var children5Plus = parseInt(data.children_5_plus || 0);
       
       row.push(adultCount);
-      row.push(childrenUnder10);
-      row.push(children10Plus);
+      row.push(childrenUnder5);
+      row.push(children5Plus);
       
       // Calculate total guest count
-      var totalGuests = adultCount + childrenUnder10 + children10Plus;
+      var totalGuests = adultCount + childrenUnder5 + children5Plus;
       row.push(totalGuests);
       
       // Collect all adult names and combine into one column
@@ -139,8 +139,8 @@ function getOrCreateSheet(spreadsheet, sheetName, formType) {
         'Primary Name', 
         'Attendance',
         'Adults Count',
-        'Children Under 10 (No Seat)',
-        'Children 10+ (Seat Provided)', 
+        'Children Under 5 (No Seat)',
+        'Children 5+ (Seat Provided)', 
         'Total Guests',
         'Adult Names'
       ];
@@ -237,11 +237,11 @@ function sendCombinedEmailNotification(spreadsheet, primaryName) {
       body += '✅ Attendance: ' + (weddingData.attendance || 'Not specified') + '\n';
       
       if (weddingData.attendance && weddingData.attendance.toLowerCase() === 'yes') {
-        var totalGuests = parseInt(weddingData.adults || 0) + parseInt(weddingData.children_under_10 || 0) + parseInt(weddingData.children_10_plus || 0);
+        var totalGuests = parseInt(weddingData.adults || 0) + parseInt(weddingData.children_under_5 || 0) + parseInt(weddingData.children_5_plus || 0);
         body += '👥 Total Guests: ' + totalGuests + '\n';
         body += '   - Adults: ' + (weddingData.adults || '0') + '\n';
-        body += '   - Children Under 10: ' + (weddingData.children_under_10 || '0') + '\n';
-        body += '   - Children 10+: ' + (weddingData.children_10_plus || '0') + '\n';
+        body += '   - Children Under 5: ' + (weddingData.children_under_5 || '0') + '\n';
+        body += '   - Children 5+: ' + (weddingData.children_5_plus || '0') + '\n';
         
         // Add adult names if provided
         var adultNames = [];
@@ -324,8 +324,8 @@ function getLatestSubmission(spreadsheet, sheetName, primaryName) {
         if (sheetName === 'Wedding RSVPs') {
           submission.attendance = data[i][2];
           submission.adults = data[i][3];
-          submission.children_under_10 = data[i][4];
-          submission.children_10_plus = data[i][5];
+          submission.children_under_5 = data[i][4];
+          submission.children_5_plus = data[i][5];
           // Adult names are in the last column as a string
           var adultNamesString = data[i][7] || '';
           var adultNamesArray = adultNamesString.split(', ').filter(function(name) { return name.trim() !== ''; });
@@ -371,15 +371,15 @@ function sendEmailNotification(formType, data) {
     
     if (formType === 'wedding') {
       console.log('Preparing wedding email body...');
-      var totalGuests = parseInt(data.adults || 0) + parseInt(data.children_under_10 || 0) + parseInt(data.children_10_plus || 0);
+      var totalGuests = parseInt(data.adults || 0) + parseInt(data.children_under_5 || 0) + parseInt(data.children_5_plus || 0);
       
       body = 'New Wedding RSVP Received!\n\n' +
              'Primary Name: ' + (data.primary_name || 'Not provided') + '\n' +
              'Attendance: ' + (data.attendance || 'Not specified') + '\n' +
              'Total Guests: ' + totalGuests + '\n' +
              '   - Adults: ' + (data.adults || '0') + '\n' +
-             '   - Children Under 10: ' + (data.children_under_10 || '0') + '\n' +
-             '   - Children 10+: ' + (data.children_10_plus || '0') + '\n\n';
+             '   - Children Under 5: ' + (data.children_under_5 || '0') + '\n' +
+             '   - Children 5+: ' + (data.children_5_plus || '0') + '\n\n';
       
       // Add adult names if provided
       var adultNames = [];
