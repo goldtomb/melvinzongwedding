@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 inputDiv.innerHTML = `
                     <label for="adult-${i}">${labelText}</label>
-                    <input type="text" id="adult-${i}" name="adult_${i}" placeholder="${placeholderText}" required>
+                    <input type="text" id="adult-${i}" name="adult_${i}" placeholder="${placeholderText}" pattern="[A-Za-z\\s'\\-]+" title="Only letters, apostrophes, dashes, and spaces allowed" oninput="this.value = this.value.replace(/[^A-Za-z\\s'\\-]/g, '')" required>
                 `;
                 guestList.appendChild(inputDiv);
                 
@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
         guestDiv.innerHTML = `
             <label for="after-party-guest-${guestIndex}" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; display: block;">${labelText}</label>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <input type="text" id="after-party-guest-${guestIndex}" name="after_party_guest_${guestIndex}" placeholder="${placeholderText}" class="additional-guest-name" style="flex: 1; padding: 18px; font-size: 1.6rem; border: 2px solid var(--battleship-gray); border-radius: 5px; width: 100%;" required>
+                <input type="text" id="after-party-guest-${guestIndex}" name="after_party_guest_${guestIndex}" placeholder="${placeholderText}" class="additional-guest-name" style="flex: 1; padding: 18px; font-size: 1.6rem; border: 2px solid var(--battleship-gray); border-radius: 5px; width: 100%;" pattern="[A-Za-z\\\\s'\\\\-]+" title="Only letters, apostrophes, dashes, and spaces allowed" oninput="this.value = this.value.replace(/[^A-Za-z\\\\s'\\\\-]/g, '')" required>
                 <button type="button" class="remove-guest-btn" style="padding: 6px; background: #d32f2f; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 0.85rem; width: 30px; height: 30px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">✕</button>
             </div>
         `;
@@ -615,6 +615,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add formatting to input fields
     function addNameFormatting(input) {
+        // Add pattern validation and input filtering
+        input.setAttribute('pattern', '[A-Za-z\\s\'\\-]+');
+        input.setAttribute('title', 'Only letters, apostrophes, dashes, and spaces allowed');
+        
+        // Filter input in real-time
+        input.addEventListener('input', function() {
+            this.value = this.value.replace(/[^A-Za-z\s'\-]/g, '');
+        });
+        
         input.addEventListener('blur', function() {
             this.value = formatProperCase(this.value.trim());
         });

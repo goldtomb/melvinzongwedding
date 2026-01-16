@@ -71,7 +71,7 @@
               <h2 data-translate="wedding-rsvp-title">Wedding Celebration RSVP</h2>
               
               <label for="primary-name" data-translate="primary-name-label">Primary Contact Name:</label>
-              <input type="text" id="primary-name" name="primary_name" data-translate-placeholder="primary-name-placeholder" placeholder="Your full name" required />
+              <input type="text" id="primary-name" name="primary_name" data-translate-placeholder="primary-name-placeholder" placeholder="Your full name" pattern="[A-Za-z\s'\-]+" title="Only letters, apostrophes, dashes, and spaces allowed" oninput="this.value = this.value.replace(/[^A-Za-z\s'\-]/g, '')" required />
 
               <label for="attendance" data-translate="attendance-label">Will you attend our wedding?</label>
               <select id="attendance" name="attendance" required>
@@ -90,6 +90,7 @@
                   max="10"
                   data-translate-placeholder="adults-placeholder"
                   placeholder="How many adults total?"
+                  oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 2); if (parseInt(this.value) > 10) this.value = '10';"
                 />
                 
                 <label for="children-under-5" data-translate="children-under-5-label">Number of Children Under 5: (no seat provided)</label>
@@ -101,6 +102,7 @@
                   max="10"
                   data-translate-placeholder="children-under-5-placeholder"
                   placeholder="Children under 5 years old"
+                  oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 2); if (parseInt(this.value) > 10) this.value = '10';"
                 />
                 
                 <label for="children-5-plus" data-translate="children-5-plus-label">Number of Children 5 and Over: (seat provided)</label>
@@ -112,6 +114,7 @@
                   max="10"
                   data-translate-placeholder="children-5-plus-placeholder"
                   placeholder="Children 5+ years old"
+                  oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 2); if (parseInt(this.value) > 10) this.value = '10';"
                 />
                 
 
