@@ -1,6 +1,15 @@
 function doPost(e) {
   console.log('=== SCRIPT EXECUTION STARTED ===');
   console.log('Request received at:', new Date().toISOString());
+
+  // Emergency switch to stop accepting RSVP submissions without redeploying frontend.
+  var RSVP_OPEN = false;
+  if (!RSVP_OPEN) {
+    return ContentService.createTextOutput(JSON.stringify({
+      success: false,
+      error: 'RSVP submissions are now closed'
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
   
   try {
     console.log('Raw parameters received:', JSON.stringify(e.parameter));

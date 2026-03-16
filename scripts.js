@@ -154,37 +154,41 @@ if (slides.length > 0) {
 // const date = new Date();
 // console.log(date);\
 // Update the countdown every second
-const countdownFunction = setInterval(() => {
-    // Get the current date and time
-    const now = new Date().getTime();
+if (time && daysLeft) {
+    const countdownFunction = setInterval(() => {
+        // Get the current date and time
+        const now = new Date().getTime();
 
-    // Calculate the distance between now and the wedding date
-    const distance = weddingDate - now;
+        // Calculate the distance between now and the wedding date
+        const distance = weddingDate - now;
 
-    // Time calculations for days, hours, minutes, and seconds
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        // Time calculations for days, hours, minutes, and seconds
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    // Display the result in the countdown div
-    time.innerHTML = 
-        `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        // Display the result in the countdown div
+        time.innerHTML = 
+            `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
-    // If the countdown is over, display a message
-    if (distance <= 0) {
-        clearInterval(countdownFunction);
-        time.innerHTML = "The big day has arrived!";
-        daysLeft.classList.add('hidden');
-    }
-}, 1000);
+        // If the countdown is over, display a message
+        if (distance <= 0) {
+            clearInterval(countdownFunction);
+            time.innerHTML = "The big day has arrived!";
+            daysLeft.classList.add('hidden');
+        }
+    }, 1000);
+}
 
-toggleMenu.addEventListener('click', (e) => {
-    e.stopPropagation(); // Prevent event bubbling
-    navList.classList.toggle('open');
-    toggleMenu.firstElementChild.classList.toggle('fa-bars');
-    toggleMenu.firstElementChild.classList.toggle('fa-x');
-})
+if (toggleMenu && navList) {
+    toggleMenu.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent event bubbling
+        navList.classList.toggle('open');
+        toggleMenu.firstElementChild.classList.toggle('fa-bars');
+        toggleMenu.firstElementChild.classList.toggle('fa-x');
+    })
+}
 
 // Close menu when any nav link is clicked
 navLinks.forEach(navLink => {
@@ -236,6 +240,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Wedding RSVP form
     const weddingForm = document.getElementById('wedding-rsvp');
     const afterPartyForm = document.getElementById('after-party-rsvp');
+
+    // RSVP may be intentionally removed when submissions are closed.
+    if (!weddingForm || !attendanceSelect || !attendanceDetails || !adultsInput || !guestList) {
+        return;
+    }
 
     // Show/hide attendance details based on selection
     attendanceSelect.addEventListener('change', function() {

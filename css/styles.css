@@ -638,6 +638,25 @@ h2 {
   font-size: 1.5rem;
 }
 
+.rsvp-closed-card {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 30px;
+  border: 3px solid var(--battleship-gray);
+  border-radius: 18px;
+  background: var(--rose-quartz);
+  text-align: center;
+}
+
+.rsvp-closed-card h2 {
+  margin-bottom: 16px;
+}
+
+.rsvp-closed-card p {
+  font-size: 1.4rem;
+  margin-bottom: 12px;
+}
+
 .rsvp-form button {
   padding: 10px 40px;
   border-radius: 30px;
