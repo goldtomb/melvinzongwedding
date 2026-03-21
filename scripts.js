@@ -700,6 +700,16 @@ const translations = {
         'closing-time': 'Closing hour, get those last few dance moves in w/ our DJ music',
         'bartending-info': 'There will be two bartending stations. (Melvin doesn\'t like waiting in line to get his drinks so hopefully this helps)',
         
+        // Menu
+        'nav-food': 'Menu',
+        'menu-title': 'Menu',
+        'menu-item1': 'Shrimp Ceviche W/ Mini Tostadas',
+        'menu-item2': 'Tropical Salad',
+        'menu-item3': 'White Rice',
+        'menu-item4': 'Chicken Fajita',
+        'menu-item5': 'Country-Style Chopped Skirt Steak W/ Bell Peppers And Cheese',
+        'menu-item6': 'Corn Tortillas',
+
         // RSVP
         'rsvp-title': 'RSVP',
         'wedding-rsvp-title': 'Wedding Celebration RSVP',
@@ -778,6 +788,16 @@ const translations = {
         'closing-time': 'Hora de cierre, últimos bailes con nuestra música de DJ',
         'bartending-info': 'Habrá dos estaciones de bar. (A Melvin no le gusta hacer fila para sus bebidas, así que esperamos que esto ayude)',
         
+        // Menu
+        'nav-food': 'Men\u00FA',
+        'menu-title': 'Men\u00FA',
+        'menu-item1': 'Ceviche De Camar\u00F3n Con Mini Tostadas',
+        'menu-item2': 'Ensalada Tropical',
+        'menu-item3': 'Arroz Blanco',
+        'menu-item4': 'Fajita De Pollo',
+        'menu-item5': 'Arrachera Campesina',
+        'menu-item6': 'Tortillas De Ma\u00EDz',
+
         // RSVP
         'rsvp-title': 'Confirmar Asistencia',
         'wedding-rsvp-title': 'Confirmación de Celebración de Boda',
